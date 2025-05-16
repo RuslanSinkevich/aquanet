@@ -1,4 +1,4 @@
-name: Deploy Backend to Server
+name: Deploy Backend and Frontend
 
 on:
   push:
@@ -13,12 +13,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # --- Фронтенд ---
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: ./frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: ./frontend
+
+      # --- Бэкенд ---
+      - name: Install backend dependencies
         run: npm install
         working-directory: ./backend
 
@@ -26,6 +36,7 @@ jobs:
         run: npm run build
         working-directory: ./backend
 
+      # --- Деплой на сервер ---
       - name: Deploy backend via rsync + ssh
         uses: easingthemes/ssh-deploy@main
         with:
@@ -37,6 +48,18 @@ jobs:
           TARGET: "/var/www/aquanet/backend"
           EXCLUDE: ".env node_modules .git .github"
 
+      - name: Deploy frontend via rsync + ssh
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.SERVER_HOST }}
+          REMOTE_USER: ${{ secrets.SERVER_USER }}
+          REMOTE_PORT: ${{ secrets.SERVER_SSH_PORT }}
+          SOURCE: "./frontend/build/"
+          TARGET: "/var/www/aquanet/frontend"
+          EXCLUDE: ".env node_modules .git .github"
+
+      # --- Запуск скриптов на сервере ---
       - name: Run post-deploy script on server
         uses: appleboy/ssh-action@v0.1.8
         with:
@@ -48,3 +71,6 @@ jobs:
             cd /var/www/aquanet/backend
             npm install --production
             pm2 restart aquanet-backend || pm2 start dist/main.js --name aquanet-backend
+
+            cd /var/www/aquanet/frontend
+            # (если нужно, здесь можно обновить nginx или что-то ещё)
