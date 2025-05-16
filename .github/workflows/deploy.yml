@@ -19,12 +19,22 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build project
         run: npm run build
 
-      - name: Deploy to server via SSH
+      - name: Sync project files to server
+        uses: burnett01/rsync-deployments@v1.0.2
+        with:
+          switches: -avzr --delete --exclude=".env" --exclude="node_modules"
+          path: ./  # всё, что в репозитории
+          remote_path: /var/www/aquanet/backend
+          remote_host: ${{ secrets.SERVER_HOST }}
+          remote_user: ${{ secrets.SERVER_USER }}
+          remote_key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Install & restart backend on server
         uses: appleboy/ssh-action@v0.1.9
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -33,7 +43,6 @@ jobs:
           port: ${{ secrets.SERVER_SSH_PORT }}
           script: |
             cd /var/www/aquanet/backend
-            git pull origin master
-            npm ci
+            npm install
             npm run build
             pm2 restart aquanet-backend || pm2 start dist/main.js --name aquanet-backend
