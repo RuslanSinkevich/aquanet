@@ -1,9 +1,9 @@
 import { Model } from "sequelize-typescript";
-interface UserCreationsAttr {
+interface UserCreationAttrs {
     email: string;
     password: string;
 }
-export declare class User extends Model<User, UserCreationsAttr> {
+export declare class User extends Model<User, UserCreationAttrs> {
     id: number;
     email: string;
     password: string;
