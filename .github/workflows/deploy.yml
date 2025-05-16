@@ -1,10 +1,3 @@
-name: Deploy Backend to Server
-
-on:
-  push:
-    branches:
-      - master
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -20,9 +13,11 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./backend
 
       - name: Build project
         run: npm run build
+        working-directory: ./backend
 
       - name: Deploy via rsync + ssh
         uses: easingthemes/ssh-deploy@main
@@ -31,7 +26,7 @@ jobs:
           REMOTE_HOST: ${{ secrets.SERVER_HOST }}
           REMOTE_USER: ${{ secrets.SERVER_USER }}
           REMOTE_PORT: ${{ secrets.SERVER_SSH_PORT }}
-          SOURCE: "."
+          SOURCE: "backend/"
           TARGET: "/var/www/aquanet/backend"
           EXCLUDE: ".env node_modules .git .github"
           SCRIPT_AFTER: |
