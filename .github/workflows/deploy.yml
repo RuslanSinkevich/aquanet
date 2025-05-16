@@ -45,6 +45,17 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_SSH_PORT }}
           script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # load nvm
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # load nvm bash_completion
+
             cd /var/www/aquanet/backend
+
+            # Убедимся, что node и npm доступны
+            node -v
+            npm -v
+
             npm install --production
+
+            # Запуск pm2, если pm2 не в PATH, можно указать полный путь, например /usr/local/bin/pm2
             pm2 restart aquanet-backend || pm2 start dist/main.js --name aquanet-backend
