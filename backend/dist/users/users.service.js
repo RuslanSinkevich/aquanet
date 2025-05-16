@@ -20,7 +20,7 @@ let UsersService = class UsersService {
     constructor(userRepository) {
         this.userRepository = userRepository;
     }
-    async createUser(dto) {
+    async createUser() {
     }
     async getAllUsers() {
     }
