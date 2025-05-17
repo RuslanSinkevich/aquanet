@@ -45,7 +45,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_SSH_PORT }}
           script: |
-            cat > /var/www/aquanet/backend/.env <<EOF
+            cat > /var/www/aquanet/backend/.env <<'EOF'
             DB_HOST="${{ secrets.DB_HOST }}"
             DB_PORT="${{ secrets.DB_PORT }}"
             DB_USERNAME="${{ secrets.DB_USERNAME }}"
