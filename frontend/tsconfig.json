@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src", // Указывает, что базовый каталог для разрешения путей — это папка src
+    "target": "ES2022", // Указывает целевую версию ECMAScript
+    "lib": ["ES2023", "DOM", "DOM.Iterable"], // Покрывает новейшие возможности ES и браузера
+    "module": "ESNext", // Использует модули ESNext
+    "moduleResolution": "node", // Разрешение модулей как в Node.js
+    "jsx": "react-jsx", // Поддержка JSX для React
+    "strict": true, // Включает строгий режим TypeScript
+    "noFallthroughCasesInSwitch": true, // Запрещает падение через case в switch
+    "forceConsistentCasingInFileNames": true, // Консистентность регистра имен файлов
+    "skipLibCheck": true, // Пропускает проверку типов библиотек
+    "esModuleInterop": true, // Поддержка CommonJS модулей
+    "allowSyntheticDefaultImports": true, // Импорты по умолчанию для CommonJS
+    "resolveJsonModule": true, // Разрешение JSON модулей
+    "isolatedModules": true, // Каждый файл должен быть модулем
+    "allowJs": true, // Разрешает использование JavaScript файлов
+    "noEmit": true, // Не генерировать выходные файлы
+    "types": ["vitest/globals"]
+    
+  },
+  "exclude": [
+    "node_modules", // Исключает папку node_modules
+    "build" // Исключает папку build
+  ]
+}

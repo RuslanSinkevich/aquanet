@@ -1,0 +1,19 @@
+@for $i from 1 through 20 {
+  .w-#{$i * 5} {
+    width: $i * 5% !important;
+  }
+}
+
+@for $i from 1 through 20 {
+  .vw-#{$i * 5} {
+    width: $i * 5vw !important;
+  }
+}
+
+@for $i from 1 through 10 {
+  .min-w-#{$i * 100} {
+    min-width: $i * 100px !important;
+  }
+}
+
+
