@@ -46,11 +46,11 @@ jobs:
           port: ${{ secrets.SERVER_SSH_PORT }}
           script: |
             cat > /var/www/aquanet/backend/.env <<EOF
-            DB_HOST=${{ secrets.DB_HOST }}
-            DB_PORT=${{ secrets.DB_PORT }}
-            DB_USERNAME=${{ secrets.DB_USERNAME }}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            DB_DATABASE=${{ secrets.DB_DATABASE }}
+            DB_HOST="${{ secrets.DB_HOST }}"
+            DB_PORT="${{ secrets.DB_PORT }}"
+            DB_USERNAME="${{ secrets.DB_USERNAME }}"
+            DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
+            DB_DATABASE="${{ secrets.DB_DATABASE }}"
             EOF
 
       - name: Run post-deploy script on server
