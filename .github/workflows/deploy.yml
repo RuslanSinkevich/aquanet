@@ -37,6 +37,22 @@ jobs:
           TARGET: "/var/www/aquanet/backend"
           EXCLUDE: ".env node_modules .git .github"
 
+      - name: Create .env file on server
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_SSH_PORT }}
+          script: |
+            cat > /var/www/aquanet/backend/.env <<EOF
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            DB_USERNAME=${{ secrets.DB_USERNAME }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_DATABASE=${{ secrets.DB_DATABASE }}
+            EOF
+
       - name: Run post-deploy script on server
         uses: appleboy/ssh-action@v0.1.8
         with:
@@ -46,16 +62,14 @@ jobs:
           port: ${{ secrets.SERVER_SSH_PORT }}
           script: |
             export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # load nvm
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # load nvm bash_completion
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
             cd /var/www/aquanet/backend
 
-            # Убедимся, что node и npm доступны
             node -v
             npm -v
 
             npm install --production
 
-            # Запуск pm2, если pm2 не в PATH, можно указать полный путь, например /usr/local/bin/pm2
             pm2 restart aquanet-backend || pm2 start dist/main.js --name aquanet-backend
