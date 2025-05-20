@@ -26,6 +26,12 @@ jobs:
         run: npm run build
         working-directory: ./backend
 
+      - name: Add backend server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ secrets.SERVER_SSH_PORT }} ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+          cat ~/.ssh/known_hosts
+
       - name: Deploy backend files via rsync + ssh
         run: |
           echo "Starting backend deployment via rsync..."
@@ -95,6 +101,12 @@ jobs:
       - name: Build frontend
         run: npm run build
         working-directory: ./frontend
+
+      - name: Add frontend server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ secrets.SERVER_SSH_PORT }} ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+          cat ~/.ssh/known_hosts
 
       - name: Deploy frontend static files via rsync + ssh
         run: |
