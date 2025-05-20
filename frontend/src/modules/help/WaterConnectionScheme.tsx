@@ -5,22 +5,31 @@ const { Title, Paragraph, Text } = Typography;
 
 const WaterConnectionInfo = () => {
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://comments.app/js/widget.js?3";
-    script.async = true;
-    script.setAttribute("data-comments-app-website", "r8jBNIEP");
-    script.setAttribute("data-limit", "5");
-    script.setAttribute("data-color", "F4F4F4");
-    script.setAttribute("data-dislikes", "1");
-    script.setAttribute("data-outlined", "1");
-    script.setAttribute("data-colorful", "1");
-    script.setAttribute("data-dark", "0");
 
-    document.body.appendChild(script);
-    return () => {
-      document.body.removeChild(script);
-    };
+
+    // @ts-ignore
+    window.AnyComment = window.AnyComment || [];
+    // @ts-ignore
+    window.AnyComment.Comments = [];
+
+    // @ts-ignore
+    window.AnyComment.Comments.push({
+      root: 'anycomment-app',
+      app_id: 7063,
+      language: 'ru',
+    });
+
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.async = true;
+    script.src = 'https://widget.anycomment.io/comment/embed.js';
+
+    const firstScript = document.getElementsByTagName('script')[0];
+    if (firstScript?.parentNode) {
+      firstScript.parentNode.insertBefore(script, firstScript.nextSibling);
+    }
   }, []);
+
 
   return (
     <div style={{ padding: "24px" }}>
@@ -151,7 +160,9 @@ const WaterConnectionInfo = () => {
           </Space>
         </Card>
       </Space>
+      <div id="anycomment-app" />
     </div>
+    
   );
 };
 
