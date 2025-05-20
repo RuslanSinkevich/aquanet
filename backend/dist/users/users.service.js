@@ -20,10 +20,8 @@ let UsersService = class UsersService {
     constructor(userRepository) {
         this.userRepository = userRepository;
     }
-    async createUser() {
-    }
-    async getAllUsers() {
-    }
+    async createUser() { }
+    async getAllUsers() { }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
