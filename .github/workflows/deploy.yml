@@ -34,7 +34,18 @@ jobs:
         run: npm run build
         working-directory: ./backend
 
-      # 6. Деплой файлов бэкенда на сервер через rsync + ssh
+      # 6. Создание целевой директории на сервере
+      - name: Create target directory on server
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_SSH_PORT }}
+          script: |
+            mkdir -p /var/www/aquanet/backend
+
+      # 7. Деплой файлов бэкенда на сервер через rsync + ssh
       - name: Deploy backend files via rsync + ssh
         uses: easingthemes/ssh-deploy@main
         with:
@@ -49,9 +60,8 @@ jobs:
             node_modules/
             .git
             .github
-          DELETE: "true" # Удаление старых файлов перед копированием новых
 
-      # 7. Создание файла .env на сервере
+      # 8. Создание файла .env на сервере
       - name: Create backend .env on server
         uses: appleboy/ssh-action@v0.1.8
         with:
@@ -68,7 +78,7 @@ jobs:
             DB_DATABASE="${{ secrets.DB_DATABASE }}"
             EOF
 
-      # 8. Запуск post-deploy скрипта на сервере (npm install + pm2)
+      # 9. Запуск post-deploy скрипта на сервере (npm install + pm2)
       - name: Run backend post-deploy script on server (npm install + pm2)
         uses: appleboy/ssh-action@v0.1.8
         with:
@@ -112,7 +122,18 @@ jobs:
         run: npm run build
         working-directory: ./frontend
 
-      # 5. Деплой статических файлов фронтенда на сервер через rsync + ssh
+      # 5. Создание целевой директории на сервере
+      - name: Create target directory on server
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_SSH_PORT }}
+          script: |
+            mkdir -p /var/www/aquanet/frontend
+
+      # 6. Деплой статических файлов фронтенда на сервер через rsync + ssh
       - name: Deploy frontend static files via rsync + ssh
         uses: easingthemes/ssh-deploy@main
         with:
@@ -127,9 +148,8 @@ jobs:
             node_modules/
             .git
             .github
-          DELETE: "true" # Удаление старых файлов перед копированием новых
 
-      # 6. Перезагрузка nginx для применения изменений фронтенда
+      # 7. Перезагрузка nginx для применения изменений фронтенда
       - name: Reload nginx to apply frontend changes
         uses: appleboy/ssh-action@v0.1.8
         with:
