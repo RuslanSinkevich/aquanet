@@ -35,7 +35,11 @@ jobs:
           REMOTE_PORT: ${{ secrets.SERVER_SSH_PORT }}
           SOURCE: "./backend/"
           TARGET: "/var/www/aquanet/backend"
-          EXCLUDE: ".env node_modules .git .github"
+          EXCLUDE: |
+            .env
+            node_modules
+            .git
+            .github
 
       - name: Create backend .env on server
         uses: appleboy/ssh-action@v0.1.8
@@ -101,7 +105,11 @@ jobs:
           REMOTE_PORT: ${{ secrets.SERVER_SSH_PORT }}
           SOURCE: "./frontend/build/"
           TARGET: "/var/www/aquanet/frontend"
-          EXCLUDE: ".env node_modules .git .github"
+          EXCLUDE: |
+            .env
+            node_modules
+            .git
+            .github
 
       - name: Reload nginx to apply frontend changes
         uses: appleboy/ssh-action@v0.1.8
