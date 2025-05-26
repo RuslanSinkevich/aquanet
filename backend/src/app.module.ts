@@ -5,6 +5,7 @@ import { UsersModule } from "./users/users.module";
 import { User } from "./users/users.model";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { AuthModule } from "./auth/auth.module";
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { AppService } from "./app.service";
     SequelizeModule.forRoot({
       dialect: "postgres",
       host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT), // убедись, что в env стоит 5432 или правильный порт
+      port: Number(process.env.DB_PORT),
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
@@ -23,8 +24,9 @@ import { AppService } from "./app.service";
       retryDelay: 2000,
     }),
     UsersModule,
+    AuthModule
   ],
-  controllers: [AppController],
+  controllers: [AppController, ],
   providers: [AppService],
 })
 export class AppModule {}

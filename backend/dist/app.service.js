@@ -10,11 +10,7 @@ exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
 let AppService = class AppService {
     getHello() {
-        const user = [
-            { id: 1, name: "rash" },
-            { id: 2, name: "rash3" },
-        ];
-        return user.map((item) => item.name).toString();
+        return "Welcome to Aquanet backend!";
     }
 };
 exports.AppService = AppService;

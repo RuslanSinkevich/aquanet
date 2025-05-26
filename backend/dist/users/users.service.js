@@ -14,14 +14,21 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
-const users_model_1 = require("./users.model");
 const sequelize_1 = require("@nestjs/sequelize");
+const users_model_1 = require("./users.model");
 let UsersService = class UsersService {
-    constructor(userRepository) {
-        this.userRepository = userRepository;
+    constructor(userModel) {
+        this.userModel = userModel;
     }
-    async createUser() { }
-    async getAllUsers() { }
+    async create(data) {
+        return this.userModel.create(data);
+    }
+    async findByPhone(phone) {
+        return this.userModel.findOne({ where: { phone } });
+    }
+    async confirmUser(id) {
+        await this.userModel.update({ banned: true }, { where: { id } });
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([

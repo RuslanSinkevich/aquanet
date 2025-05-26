@@ -15,31 +15,46 @@ let User = class User extends sequelize_typescript_1.Model {
 };
 exports.User = User;
 __decorate([
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER,
-        unique: true,
-        autoIncrement: true,
-        primaryKey: true,
-    }),
+    (0, sequelize_typescript_1.Column)({ primaryKey: true, autoIncrement: true, type: sequelize_typescript_1.DataType.INTEGER }),
     __metadata("design:type", Number)
 ], User.prototype, "id", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING, unique: true, allowNull: false }),
+    (0, sequelize_typescript_1.Column)({ field: 'first_name', type: sequelize_typescript_1.DataType.STRING }),
     __metadata("design:type", String)
-], User.prototype, "email", void 0);
+], User.prototype, "firstName", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING, allowNull: false }),
+    (0, sequelize_typescript_1.Column)({ field: 'last_name', type: sequelize_typescript_1.DataType.STRING }),
     __metadata("design:type", String)
-], User.prototype, "password", void 0);
+], User.prototype, "lastName", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({ unique: true, type: sequelize_typescript_1.DataType.STRING }),
+    __metadata("design:type", String)
+], User.prototype, "phone", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({ field: 'house_number', type: sequelize_typescript_1.DataType.STRING }),
+    __metadata("design:type", String)
+], User.prototype, "houseNumber", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({ field: 'password_hash', type: sequelize_typescript_1.DataType.STRING }),
+    __metadata("design:type", String)
+], User.prototype, "passwordHash", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({ field: 'is_confirmed', type: sequelize_typescript_1.DataType.BOOLEAN, defaultValue: false }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isConfirmed", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.BOOLEAN, defaultValue: false }),
     __metadata("design:type", Boolean)
 ], User.prototype, "banned", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING, allowNull: true }),
-    __metadata("design:type", String)
-], User.prototype, "banReasons", void 0);
+    (0, sequelize_typescript_1.Column)({ field: 'created_at', type: sequelize_typescript_1.DataType.DATE }),
+    __metadata("design:type", Date)
+], User.prototype, "createdAt", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({ field: 'updated_at', type: sequelize_typescript_1.DataType.DATE }),
+    __metadata("design:type", Date)
+], User.prototype, "updatedAt", void 0);
 exports.User = User = __decorate([
-    (0, sequelize_typescript_1.Table)({ tableName: "users" })
+    (0, sequelize_typescript_1.Table)({ tableName: 'users' })
 ], User);
 //# sourceMappingURL=users.model.js.map

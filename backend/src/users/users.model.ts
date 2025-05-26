@@ -1,29 +1,34 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
-interface UserCreationAttrs {
-  email: string;
-  password: string;
-}
-
-@Table({ tableName: "users" })
-export class User extends Model<User, UserCreationAttrs> {
-  @Column({
-    type: DataType.INTEGER,
-    unique: true,
-    autoIncrement: true,
-    primaryKey: true,
-  })
+@Table({ tableName: 'users' })
+export class User extends Model<User> {
+  @Column({ primaryKey: true, autoIncrement: true, type: DataType.INTEGER })
   id: number;
 
-  @Column({ type: DataType.STRING, unique: true, allowNull: false })
-  email: string;
+  @Column({ field: 'first_name', type: DataType.STRING })
+  firstName: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
-  password: string;
+  @Column({ field: 'last_name', type: DataType.STRING })
+  lastName: string;
+
+  @Column({ unique: true, type: DataType.STRING })
+  phone: string;
+
+  @Column({ field: 'house_number', type: DataType.STRING })
+  houseNumber: string;
+
+  @Column({ field: 'password_hash', type: DataType.STRING })
+  passwordHash: string;
+
+  @Column({ field: 'is_confirmed', type: DataType.BOOLEAN, defaultValue: false })
+  isConfirmed: boolean;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   banned: boolean;
 
-  @Column({ type: DataType.STRING, allowNull: true })
-  banReasons: string;
+  @Column({ field: 'created_at', type: DataType.DATE })
+  createdAt: Date;
+
+  @Column({ field: 'updated_at', type: DataType.DATE })
+  updatedAt: Date;
 }
