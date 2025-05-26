@@ -1,13 +1,13 @@
-import { Model } from "sequelize-typescript";
-interface UserCreationAttrs {
-    email: string;
-    password: string;
-}
-export declare class User extends Model<User, UserCreationAttrs> {
+import { Model } from 'sequelize-typescript';
+export declare class User extends Model<User> {
     id: number;
-    email: string;
-    password: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    houseNumber: string;
+    passwordHash: string;
+    isConfirmed: boolean;
     banned: boolean;
-    banReasons: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
-export {};

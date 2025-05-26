@@ -17,11 +17,10 @@ let UsersModule = class UsersModule {
 exports.UsersModule = UsersModule;
 exports.UsersModule = UsersModule = __decorate([
     (0, common_1.Module)({
-        controllers: [users_controller_1.UsersController],
+        imports: [sequelize_1.SequelizeModule.forFeature([users_model_1.User])],
         providers: [users_service_1.UsersService],
-        imports: [
-            sequelize_1.SequelizeModule.forFeature([users_model_1.User])
-        ]
+        exports: [users_service_1.UsersService],
+        controllers: [users_controller_1.UsersController],
     })
 ], UsersModule);
 //# sourceMappingURL=users.module.js.map

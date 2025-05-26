@@ -1,14 +1,16 @@
 import React from "react";
 import { Config } from "./config/config";
 import { Route, Routes } from "react-router-dom";
-import WaterConnectionScheme from "modules/help/WaterConnectionScheme";
+import PageWaterConnection from "pages/PageWaterConnection";
 
 export default function AppHome() {
   Config();
 
   return (
-    <Routes>
-      <Route path="/" element={<WaterConnectionScheme />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<PageWaterConnection />} />
+      </Routes>
+    </>
   );
 }
