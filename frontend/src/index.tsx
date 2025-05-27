@@ -7,8 +7,8 @@ import locale from "antd/es/locale/ru_RU";
 import "bootstrap/dist/js/bootstrap.bundle";
 import "./index.scss";
 import { getThemeConfig } from "utils/ConfigProviderTheme";
-import { store } from "store/store";
 import { Provider } from "react-redux";
+import { store } from "store/BaseStore";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
