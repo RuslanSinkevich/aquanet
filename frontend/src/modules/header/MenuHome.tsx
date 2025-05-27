@@ -1,13 +1,21 @@
 import React, { useState } from "react";
 import Link from "antd/es/typography/Link";
-import { Modal } from "antd";
+import { Button } from "antd";
+import { useAppSelector, useAppDispatch } from "hooks/Redux";
+import { logout } from "store/slice/AuthSlice";
 import LoginForm from "modules/auth/LoginForm";
+import RegisterForm from "modules/auth/RegisterForm";
 
 export default function MenuHome() {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.auth.user);
 
-  const showModal = () => setIsModalVisible(true);
-  const handleCancel = () => setIsModalVisible(false);
+  const [isModalLoginForm, setIsModalLoginForm] = useState(false);
+  const [isModalRegisterForm, setIsModalRegisterForm] = useState(false);
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
 
   return (
     <>
@@ -22,7 +30,7 @@ export default function MenuHome() {
             aria-expanded="false"
             aria-label="Toggle navigation"
           >
-            <span className="navbar-toggler-icon"></span>
+            <span className="navbar-toggler-icon" />
           </button>
 
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
@@ -38,32 +46,65 @@ export default function MenuHome() {
             </ul>
 
             <ul className="navbar-nav ms-auto">
-              <li className="nav-item">
-                <a
-                  href="#"
-                  className="btn btn-link text-white fw-semibold"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    showModal();
-                  }}
-                >
-                  Войти
-                </a>
-              </li>
+              {!user ? (
+                <>
+                  <li className="nav-item">
+                    <a
+                      href="#"
+                      className="btn btn-link text-white fw-semibold"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsModalLoginForm(true);
+                      }}
+                    >
+                      Войти
+                    </a>
+                  </li>
+                  <li className="nav-item">
+                    <a
+                      href="#"
+                      className="btn btn-link text-white fw-semibold"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsModalRegisterForm(true);
+                      }}
+                    >
+                      Регистрация
+                    </a>
+                  </li>
+                </>
+              ) : (
+                <li className="nav-item d-flex align-items-center">
+                  <span className="text-white fw-semibold me-3">
+                    Привет, {user.firstName}!
+                  </span>
+                  <Button
+                    type="link"
+                    className="text-white fw-semibold"
+                    onClick={handleLogout}
+                  >
+                    Выйти
+                  </Button>
+                </li>
+              )}
             </ul>
           </div>
         </div>
       </nav>
 
-      <Modal
-        title="Вход"
-        visible={isModalVisible}
-        onCancel={handleCancel}
-        footer={null}
-        destroyOnClose
-      >
-        <LoginForm onSuccess={handleCancel} />
-      </Modal>
+      {/* Модалки для незалогиненных */}
+      {!user && (
+        <>
+          <LoginForm
+            setIsShowModal={setIsModalLoginForm}
+            isShowModal={isModalLoginForm}
+          />
+          <RegisterForm
+            setIsShowModal={setIsModalRegisterForm}
+            isShowModal={isModalRegisterForm}
+          />
+        </>
+      )}
     </>
   );
 }
