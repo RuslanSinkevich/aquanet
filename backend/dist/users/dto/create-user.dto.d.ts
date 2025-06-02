@@ -1,11 +1,10 @@
-export declare class UserDto {
-    id: number;
+import { UserRole } from 'src/common/enums/user-role.enum';
+export declare class CreateUserDto {
     firstName: string;
     lastName: string;
     phone: string;
-    passwordHash: string;
     houseNumber: string;
-    isConfirmed: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+    passwordHash: string;
+    isConfirmed?: boolean;
+    role?: UserRole;
 }

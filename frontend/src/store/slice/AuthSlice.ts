@@ -1,17 +1,21 @@
-// store/slice/authSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import type { User } from "models/Users/User";
+import type { IUser } from "models/Users/user.model";
+import {
+  getAuthToken,
+  getAuthUser,
+  setAuthCookie,
+  clearAuthCookies,
+} from "utils/Cookies";
 
 export interface AuthState {
   token: string | null;
-  user: User | null;
+  user: IUser | null;
 }
 
-// Инициализация из localStorage
-const saved = localStorage.getItem("auth");
-const initialState: AuthState = saved
-  ? JSON.parse(saved)
-  : { token: null, user: null };
+const initialState: AuthState = {
+  token: getAuthToken(),
+  user: getAuthUser(),
+};
 
 const authSlice = createSlice({
   name: "auth",
@@ -19,19 +23,19 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ token: string; user: User }>
+      action: PayloadAction<{ token: string; user: IUser | null }>
     ) => {
-      state.token = action.payload.token;
-      state.user = action.payload.user;
-      console.log("state",state.token);
-      
-      // Сохраняем сразу в localStorage
-      localStorage.setItem("auth", JSON.stringify(state));
+      const { token, user } = action.payload;
+      if (token && user) {
+        state.token = token;
+        state.user = user;
+        setAuthCookie(token, user);
+      }
     },
-    logout: (state) => {
+    logout: (state) => {      
       state.token = null;
       state.user = null;
-      localStorage.removeItem("auth");
+      clearAuthCookies();
     },
   },
 });

@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux"; // Импорт хуков из React Redux
 import type { TypedUseSelectorHook } from "react-redux"; // Импорт TypedUseSelectorHook из React Redux
-import { AppDispatch, RootState } from "store/BaseStore";
+import { AppDispatch, RootState } from "store/store";
 
 // В этом коде мы создаем два кастомных хука, которые используются вместо стандартных useDispatch и useSelector.
 

@@ -3,6 +3,7 @@ import { Form, Input, Button, Alert, Modal } from "antd";
 import { useLoginMutation } from "services/AuthApi";
 import { useAppDispatch } from "hooks/Redux"; // ваш типизированный useDispatch
 import { setCredentials } from "store/slice/AuthSlice"; // ваш slice
+import { setAuthCookie } from "utils/Cookies";
 
 interface LoginFormValues {
   phone: string;
@@ -27,25 +28,16 @@ export default function LoginForm({
     try {
       // Выполняем мутацию
       const data = await login(values).unwrap();
-      // data: { access_token: string; user: User }
+      // Сохраняем в куку
+      setAuthCookie(data.token, data.user);
 
       // Диспатчим в Redux
       dispatch(
         setCredentials({
-          token: data.accessToken,
+          token: data.token,
           user: data.user,
         })
       );
-
-      // Сохраняем сразу в localStorage
-      localStorage.setItem(
-        "auth",
-        JSON.stringify({
-          token: data.accessToken,
-          user: data.user,
-        })
-      );
-
       // Закрываем модалку
       onClose();
     } catch {

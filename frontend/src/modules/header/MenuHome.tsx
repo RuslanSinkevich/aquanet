@@ -1,21 +1,24 @@
 import React, { useState } from "react";
 import Link from "antd/es/typography/Link";
-import { Button } from "antd";
+import { Button, Modal } from "antd";
 import { useAppSelector, useAppDispatch } from "hooks/Redux";
 import { logout } from "store/slice/AuthSlice";
 import LoginForm from "modules/auth/LoginForm";
-import RegisterForm from "modules/auth/RegisterForm";
+import { RegisterForm } from "modules/auth/RegisterForm";
+import { UserRole } from "../../common/enums/user-role.enum";
 
 export default function MenuHome() {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
 
   const [isModalLoginForm, setIsModalLoginForm] = useState(false);
-  const [isModalRegisterForm, setIsModalRegisterForm] = useState(false);
+  const [isShowRegisterModal, setIsShowRegisterModal] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
   };
+
+  const isAdmin = user?.role === UserRole.ADMIN;
 
   return (
     <>
@@ -66,7 +69,7 @@ export default function MenuHome() {
                       className="btn btn-link text-white fw-semibold"
                       onClick={(e) => {
                         e.preventDefault();
-                        setIsModalRegisterForm(true);
+                        setIsShowRegisterModal(true);
                       }}
                     >
                       Регистрация
@@ -76,7 +79,10 @@ export default function MenuHome() {
               ) : (
                 <li className="nav-item d-flex align-items-center">
                   <span className="text-white fw-semibold me-3">
-                    Привет, {user.firstName}!
+                    Привет, {user.firstName} {user.lastName}!
+                    {isAdmin && (
+                      <span className="ms-2 badge bg-danger">Админ</span>
+                    )}
                   </span>
                   <Button
                     type="link"
@@ -99,10 +105,14 @@ export default function MenuHome() {
             setIsShowModal={setIsModalLoginForm}
             isShowModal={isModalLoginForm}
           />
-          <RegisterForm
-            setIsShowModal={setIsModalRegisterForm}
-            isShowModal={isModalRegisterForm}
-          />
+          <Modal
+            title="Регистрация"
+            open={isShowRegisterModal}
+            onCancel={() => setIsShowRegisterModal(false)}
+            footer={null}
+          >
+            <RegisterForm onSuccess={() => setIsShowRegisterModal(false)} />
+          </Modal>
         </>
       )}
     </>
