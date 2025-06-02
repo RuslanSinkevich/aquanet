@@ -11,49 +11,112 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
+const swagger_1 = require("@nestjs/swagger");
+const user_role_enum_1 = require("../common/enums/user-role.enum");
 let User = class User extends sequelize_typescript_1.Model {
 };
 exports.User = User;
 __decorate([
-    (0, sequelize_typescript_1.Column)({ primaryKey: true, autoIncrement: true, type: sequelize_typescript_1.DataType.INTEGER }),
+    (0, swagger_1.ApiProperty)({ example: 1, description: 'Уникальный идентификатор' }),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    }),
     __metadata("design:type", Number)
 ], User.prototype, "id", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'first_name', type: sequelize_typescript_1.DataType.STRING }),
+    (0, swagger_1.ApiProperty)({ example: 'Иван', description: 'Имя пользователя' }),
+    (0, sequelize_typescript_1.Column)({
+        field: 'first_name',
+        type: sequelize_typescript_1.DataType.TEXT,
+        allowNull: false,
+    }),
     __metadata("design:type", String)
 ], User.prototype, "firstName", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'last_name', type: sequelize_typescript_1.DataType.STRING }),
+    (0, swagger_1.ApiProperty)({ example: 'Иванов', description: 'Фамилия пользователя' }),
+    (0, sequelize_typescript_1.Column)({
+        field: 'last_name',
+        type: sequelize_typescript_1.DataType.TEXT,
+        allowNull: false,
+    }),
     __metadata("design:type", String)
 ], User.prototype, "lastName", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ unique: true, type: sequelize_typescript_1.DataType.STRING }),
+    (0, swagger_1.ApiProperty)({ example: '+79001234567', description: 'Телефон пользователя' }),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.TEXT,
+        allowNull: false,
+    }),
     __metadata("design:type", String)
 ], User.prototype, "phone", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'house_number', type: sequelize_typescript_1.DataType.STRING }),
+    (0, swagger_1.ApiProperty)({ example: '12', description: 'Номер дома' }),
+    (0, sequelize_typescript_1.Column)({
+        field: 'house_number',
+        type: sequelize_typescript_1.DataType.TEXT,
+        allowNull: false,
+    }),
     __metadata("design:type", String)
 ], User.prototype, "houseNumber", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'password_hash', type: sequelize_typescript_1.DataType.STRING }),
+    (0, swagger_1.ApiProperty)({ example: 'hash123...', description: 'Хеш пароля' }),
+    (0, sequelize_typescript_1.Column)({
+        field: 'password_hash',
+        type: sequelize_typescript_1.DataType.TEXT,
+        allowNull: false,
+    }),
     __metadata("design:type", String)
 ], User.prototype, "passwordHash", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'is_confirmed', type: sequelize_typescript_1.DataType.BOOLEAN, defaultValue: false }),
+    (0, swagger_1.ApiProperty)({ example: false, description: 'Подтвержден ли пользователь' }),
+    (0, sequelize_typescript_1.Column)({
+        field: 'is_confirmed',
+        type: sequelize_typescript_1.DataType.BOOLEAN,
+        defaultValue: false,
+    }),
     __metadata("design:type", Boolean)
 ], User.prototype, "isConfirmed", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.BOOLEAN, defaultValue: false }),
+    (0, swagger_1.ApiProperty)({ example: false, description: 'Заблокирован ли пользователь' }),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.BOOLEAN,
+        defaultValue: false,
+    }),
     __metadata("design:type", Boolean)
 ], User.prototype, "banned", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'created_at', type: sequelize_typescript_1.DataType.DATE }),
+    (0, swagger_1.ApiProperty)({ example: '2024-03-15T12:00:00Z', description: 'Дата создания' }),
+    (0, sequelize_typescript_1.Column)({
+        field: 'created_at',
+        type: sequelize_typescript_1.DataType.DATE,
+        defaultValue: sequelize_typescript_1.DataType.NOW,
+    }),
     __metadata("design:type", Date)
 ], User.prototype, "createdAt", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'updated_at', type: sequelize_typescript_1.DataType.DATE }),
+    (0, swagger_1.ApiProperty)({ example: '2024-03-15T12:00:00Z', description: 'Дата обновления' }),
+    (0, sequelize_typescript_1.Column)({
+        field: 'updated_at',
+        type: sequelize_typescript_1.DataType.DATE,
+        defaultValue: sequelize_typescript_1.DataType.NOW,
+    }),
     __metadata("design:type", Date)
 ], User.prototype, "updatedAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: user_role_enum_1.UserRole.USER,
+        description: "Роль пользователя (0 - admin, 1 - prorab, 2 - user)",
+        enum: user_role_enum_1.UserRole
+    }),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER,
+        allowNull: false,
+        defaultValue: user_role_enum_1.UserRole.USER,
+    }),
+    __metadata("design:type", Number)
+], User.prototype, "role", void 0);
 exports.User = User = __decorate([
     (0, sequelize_typescript_1.Table)({ tableName: 'users' })
 ], User);

@@ -1,40 +1,45 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsString, IsNotEmpty, IsEnum, IsOptional, IsBoolean } from 'class-validator';
+import { UserRole } from 'src/common/enums/user-role.enum';
 
-export class UserDto {
-  @ApiProperty({
-    example: 1,
-    description: "Уникальный идентификатор пользователя",
-  })
-  id: number;
-
-  @ApiProperty({ example: "Руслан", description: "Имя пользователя" })
+export class CreateUserDto {
+  @ApiProperty({ example: 'Иван', description: 'Имя пользователя' })
+  @IsString()
+  @IsNotEmpty()
   firstName: string;
 
-  @ApiProperty({ example: "Синкевич", description: "Фамилия пользователя" })
+  @ApiProperty({ example: 'Иванов', description: 'Фамилия пользователя' })
+  @IsString()
+  @IsNotEmpty()
   lastName: string;
 
-  @ApiProperty({ example: "+79501234567", description: "Телефон пользователя" })
+  @ApiProperty({ example: '+79001234567', description: 'Телефон пользователя' })
+  @IsString()
+  @IsNotEmpty()
   phone: string;
 
-  // Обычно пароль не показываем в API, поэтому можно не добавлять или сделать скрытым
-  @ApiProperty({ description: "Хеш пароля", writeOnly: true })
-  passwordHash: string;
-
-  @ApiProperty({ example: "16", description: "Номер дома" })
+  @ApiProperty({ example: '12', description: 'Номер дома' })
+  @IsString()
+  @IsNotEmpty()
   houseNumber: string;
 
-  @ApiProperty({ example: false, description: "Статус подтверждения" })
-  isConfirmed: boolean;
+  @ApiProperty({ example: 'hashedPassword', description: 'Хэш пароля' })
+  @IsString()
+  @IsNotEmpty()
+  passwordHash: string;
 
-  @ApiProperty({
-    example: "2025-05-26T12:34:56.789Z",
-    description: "Дата создания",
-  })
-  createdAt: Date;
+  @ApiProperty({ example: false, description: 'Подтвержден ли пользователь' })
+  @IsBoolean()
+  @IsOptional()
+  isConfirmed?: boolean;
 
-  @ApiProperty({
-    example: "2025-05-26T12:34:56.789Z",
-    description: "Дата последнего обновления",
+  @ApiProperty({ 
+    example: UserRole.USER, 
+    description: 'Роль пользователя',
+    enum: UserRole,
+    required: false
   })
-  updatedAt: Date;
+  @IsEnum(UserRole)
+  @IsOptional()
+  role?: UserRole;
 }

@@ -7,7 +7,7 @@ export class LoginDto {
   @IsNotEmpty()
   phone: string;
 
-  @ApiProperty({ example: 'strongPassword123', description: 'Пароль пользователя' })
+  @ApiProperty({ example: 'password123', description: 'Пароль пользователя' })
   @IsString()
   @IsNotEmpty()
   password: string;

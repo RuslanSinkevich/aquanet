@@ -1,16 +1,16 @@
-import { User } from "./User";
+import { IUser } from "./user.model";
 
-export interface LoginRequest {
-    phone: string;
-    password: string;
-  }
-  
-  export interface LoginResponse {
-    accessToken: string;
-    user: User;
-  }
-  
-  export interface RegisterRequest extends Omit<User, "id"> {
-    password: string;
-  }
+export interface ILoginRequest {
+  phone: string;
+  password: string;
+}
+
+export interface ILoginResponse {
+  token: string;
+  user: IUser;
+}
+
+export interface IRegisterRequest extends Omit<IUser, "id" | "createdAt"> {
+  password: string;
+}
   

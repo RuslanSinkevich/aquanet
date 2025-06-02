@@ -15,6 +15,7 @@
     "antd": "5.23.0",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
+    "js-cookie": "^3.0.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",
@@ -33,7 +34,7 @@
     "lint": "eslint ./src/**/*.{ts,tsx,js,jsx}",
     "prod": "env-cmd -f env. -e prod vite build",
     "debug": "env-cmd -f env. -e dev vite build"
-    },
+  },
   "eslintConfig": {
     "extends": [
       "react-app"

@@ -1,8 +1,10 @@
-export interface User {
+export interface IUser {
   id: number;
   firstName: string;
   lastName: string;
   phone: string;
   houseNumber: string;
-  createdAt: string;
+  isConfirmed: boolean;
+  banned: boolean;
+  password?: string;
 }

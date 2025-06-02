@@ -1,40 +1,72 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "hooks/Redux";
 import { useGetProfileQuery } from "services/AuthApi";
 import { setCredentials, logout } from "store/slice/AuthSlice";
-import { Route, Routes } from "react-router-dom";
-import PageWaterConnection from "pages/PageWaterConnection";
+import { Routes, Route } from "react-router-dom";
+import { WaterConnectionPage } from './pages/WaterConnectionPage';
+import { ConnectionPointsList } from './modules/connection-points/ConnectionPointsList';
+import { ClientsList } from './modules/clients/ClientsList';
+import WaterConnectionInfo from './modules/info/WaterConnectionScheme';
+import { AppLayout } from './components/AppLayout';
+import { getAuthToken, getAuthUser } from "utils/Cookies";
 
-export default function App() {
+export const AppHome: React.FC = () => {
   const dispatch = useAppDispatch();
   const token = useAppSelector((state) => state.auth.token);
+  const [ready, setReady] = useState(false);
 
-  // 1) Запускаем запрос «/auth/me», но только если есть токен
+  // Читаем токен и пользователя из куки только один раз при монтировании
+  useEffect(() => {
+    if (!token) {
+      const tokenFromCookie = getAuthToken();
+      const userFromCookie = getAuthUser();
+
+      if (tokenFromCookie) {
+        dispatch(
+          setCredentials({ token: tokenFromCookie, user: userFromCookie })
+        );
+      }
+    }
+    setReady(true);
+  }, []); // Пустой массив зависимостей
+
+  // Запрос профиля — только если токен есть и ready true
   const {
     data: profile,
     error,
     isFetching,
   } = useGetProfileQuery(undefined, {
-    skip: !token,
+    skip: !token || !ready,
   });
 
-  // 2) В одном эффекте обрабатываем и success, и error
+  // Обновляем данные пользователя или выходим из аккаунта при ошибке
   useEffect(() => {
-    if (isFetching) return; // ждём окончания
+    if (!token || !ready || isFetching) return;
+
     if (profile) {
-      // Пришёл профиль — обновляем user в Redux
-      dispatch(setCredentials({ token: token!, user: profile }));
+      dispatch(setCredentials({ token, user: profile }));
     } else if (error) {
-      // Если ошибка (например, 401 или 404) — логаутим
+      console.log("logout");
       dispatch(logout());
     }
-  }, [profile, error, isFetching, dispatch, token]);
+    console.log("token:", token, "ready:", ready);
+  }, [token, profile, error, isFetching, ready, dispatch]);
+
+  if (!ready) {
+    // Пока читаем куки и не готовы — можно показать загрузку
+    return null;
+  }
 
   return (
-    <>
+    <AppLayout>
       <Routes>
-        <Route path="/" element={<PageWaterConnection />} />
+        <Route path="/" element={<WaterConnectionPage />} />
+        <Route path="/scheme" element={<WaterConnectionInfo />} />
+        <Route path="/connection-points" element={<ConnectionPointsList />} />
+        <Route path="/clients" element={<ClientsList />} />
+        <Route path="/payments" element={<div>Платежи - в разработке</div>} />
+        <Route path="/works" element={<div>Работы - в разработке</div>} />
       </Routes>
-    </>
+    </AppLayout>
   );
-}
+};

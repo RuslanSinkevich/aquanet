@@ -20,14 +20,31 @@ let UsersService = class UsersService {
     constructor(userModel) {
         this.userModel = userModel;
     }
-    async create(data) {
-        return this.userModel.create(data);
+    async create(createUserDto) {
+        return this.userModel.create(createUserDto);
+    }
+    async findAll() {
+        return this.userModel.findAll();
+    }
+    async findOne(id) {
+        return this.userModel.findByPk(id);
     }
     async findByPhone(phone) {
         return this.userModel.findOne({ where: { phone } });
     }
+    async update(id, updateUserDto) {
+        return this.userModel.update(updateUserDto, {
+            where: { id },
+            returning: true,
+        });
+    }
+    async remove(id) {
+        return this.userModel.destroy({
+            where: { id },
+        });
+    }
     async confirmUser(id) {
-        await this.userModel.update({ banned: true }, { where: { id } });
+        await this.userModel.update({ isConfirmed: true }, { where: { id } });
     }
 };
 exports.UsersService = UsersService;
