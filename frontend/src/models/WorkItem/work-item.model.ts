@@ -5,18 +5,19 @@ export interface IWorkItem {
   cost: number;
   status: string;
   dueDate?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
 }
 
-export interface ICreateWorkItemDto {
+export interface IWorkItemCreateDto {
   name: string;
   description?: string;
   cost: number;
   connectionPointId: number;
 }
 
-export interface IUpdateWorkItemDto {
+export interface IWorkItemUpdateDto {
   name?: string;
   description?: string;
   cost?: number;

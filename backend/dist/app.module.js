@@ -11,21 +11,20 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const sequelize_1 = require("@nestjs/sequelize");
 const users_module_1 = require("./users/users.module");
-const users_model_1 = require("./users/users.model");
-const app_controller_1 = require("./app.controller");
-const app_service_1 = require("./app.service");
 const auth_module_1 = require("./auth/auth.module");
 const connection_points_module_1 = require("./connection-points/connection-points.module");
-const clients_module_1 = require("./clients/clients.module");
-const utility_segments_module_1 = require("./utility-segments/utility-segments.module");
-const client_model_1 = require("./models/client.model");
+const materials_module_1 = require("./materials/materials.module");
+const work_items_module_1 = require("./work-items/work-items.module");
+const payments_module_1 = require("./payments/payments.module");
+const refunds_module_1 = require("./refunds/refunds.module");
+const user_model_1 = require("./models/user.model");
 const connection_point_model_1 = require("./models/connection-point.model");
-const payment_audit_model_1 = require("./models/payment-audit.model");
-const utility_segment_model_1 = require("./models/utility-segment.model");
-const client_connection_point_model_1 = require("./models/client-connection-point.model");
-const segment_payment_model_1 = require("./models/segment-payment.model");
-const work_item_model_1 = require("./models/work-item.model");
 const material_model_1 = require("./models/material.model");
+const work_item_model_1 = require("./models/work-item.model");
+const user_connection_point_model_1 = require("./models/user-connection-point.model");
+const payment_model_1 = require("./models/payment.model");
+const refund_model_1 = require("./models/refund.model");
+const configuration_1 = require("./config/configuration");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -33,41 +32,37 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             config_1.ConfigModule.forRoot({
+                envFilePath: '.env',
                 isGlobal: true,
-                envFilePath: '.env'
+                load: [configuration_1.default],
             }),
             sequelize_1.SequelizeModule.forRoot({
-                dialect: "postgres",
+                dialect: 'postgres',
                 host: process.env.DB_HOST,
                 port: Number(process.env.DB_PORT),
                 username: process.env.DB_USERNAME,
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_DATABASE,
                 models: [
-                    users_model_1.User,
-                    client_model_1.Client,
+                    user_model_1.User,
                     connection_point_model_1.ConnectionPoint,
-                    payment_audit_model_1.PaymentAudit,
-                    utility_segment_model_1.UtilitySegment,
-                    client_connection_point_model_1.ClientConnectionPoint,
-                    segment_payment_model_1.SegmentPayment,
+                    material_model_1.Material,
                     work_item_model_1.WorkItem,
-                    material_model_1.Material
+                    user_connection_point_model_1.UserConnectionPoint,
+                    payment_model_1.Payment,
+                    refund_model_1.Refund,
                 ],
                 autoLoadModels: true,
                 synchronize: true,
-                logging: console.log,
-                retryAttempts: 5,
-                retryDelay: 2000,
             }),
             users_module_1.UsersModule,
             auth_module_1.AuthModule,
             connection_points_module_1.ConnectionPointsModule,
-            clients_module_1.ClientsModule,
-            utility_segments_module_1.UtilitySegmentsModule
+            materials_module_1.MaterialsModule,
+            work_items_module_1.WorkItemsModule,
+            payments_module_1.PaymentsModule,
+            refunds_module_1.RefundsModule,
         ],
-        controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

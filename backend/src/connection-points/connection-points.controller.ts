@@ -29,7 +29,7 @@ import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
 import { UserRole } from "src/common/enums/user-role.enum";
 
-@ApiTags("Connection Points")
+@ApiTags("Точки подключения")
 @ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller("connection-points")

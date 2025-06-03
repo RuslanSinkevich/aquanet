@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import type { 
   IConnectionPoint,
-  ICreateConnectionPointDto,
+  IConnectionPointCreateDto,
 } from "../models/ConnectionPoint/connection-point.model";
 import baseQueryWithReauth from "./BaseQuery";
 
@@ -10,17 +10,20 @@ export const ConnectionPointsApi = createApi({
   baseQuery: baseQueryWithReauth,
   tagTypes: ['ConnectionPoint'],
   endpoints: (builder) => ({
+    // Получение списка всех точек подключения
     getConnectionPoints: builder.query<IConnectionPoint[], void>({
       query: () => "connection-points",
       providesTags: ['ConnectionPoint'],
     }),
 
+    // Получение конкретной точки подключения по ID
     getConnectionPoint: builder.query<IConnectionPoint, number>({
       query: (id) => `connection-points/${id}`,
       providesTags: ['ConnectionPoint'],
     }),
 
-    createConnectionPoint: builder.mutation<IConnectionPoint, ICreateConnectionPointDto>({
+    // Создание новой точки подключения
+    createConnectionPoint: builder.mutation<IConnectionPoint, IConnectionPointCreateDto>({
       query: (data) => ({
         url: "connection-points",
         method: "POST",
@@ -29,6 +32,7 @@ export const ConnectionPointsApi = createApi({
       invalidatesTags: ['ConnectionPoint'],
     }),
 
+    // Обновление существующей точки подключения
     updateConnectionPoint: builder.mutation<IConnectionPoint, { id: number; point: Partial<IConnectionPoint> }>({
       query: ({ id, point }) => ({
         url: `connection-points/${id}`,
@@ -38,6 +42,7 @@ export const ConnectionPointsApi = createApi({
       invalidatesTags: ['ConnectionPoint'],
     }),
 
+    // Удаление точки подключения
     deleteConnectionPoint: builder.mutation<void, number>({
       query: (id) => ({
         url: `connection-points/${id}`,

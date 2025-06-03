@@ -5,12 +5,14 @@ const app_module_1 = require("./app.module");
 const core_1 = require("@nestjs/core");
 const common_1 = require("@nestjs/common");
 async function bootstrap() {
-    const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    app.enableCors({
-        origin: 'http://localhost:3001',
-        credentials: true,
+    const logger = new common_1.Logger('Bootstrap');
+    logger.log('Starting application...');
+    const app = await core_1.NestFactory.create(app_module_1.AppModule, {
+        logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+        bufferLogs: true,
     });
     app.useGlobalPipes(new common_1.ValidationPipe());
+    app.enableCors();
     const config = new swagger_1.DocumentBuilder()
         .setTitle('Aquanet API')
         .setDescription('API для системы водоснабжения')
@@ -31,7 +33,9 @@ async function bootstrap() {
             security: [{ 'JWT-auth': [] }],
         },
     });
-    await app.listen(process.env.PORT ?? 3000);
+    const port = process.env.PORT || 3000;
+    await app.listen(port);
+    logger.log(`Application is running on: http://localhost:${port}`);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

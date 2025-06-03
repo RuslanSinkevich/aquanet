@@ -5,8 +5,11 @@ export interface IUser {
   firstName: string;
   lastName: string;
   phone: string;
-  email?: string;
   houseNumber: string;
-  createdAt: string;
   role: UserRole;
+  isConfirmed: boolean;
+  banned: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
 }

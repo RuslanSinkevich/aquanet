@@ -1,5 +1,8 @@
 import { Model } from 'sequelize-typescript';
-import { UserRole } from "src/common/enums/user-role.enum";
+import { UserRole } from "../common/enums/user-role.enum";
+import { ConnectionPoint } from '../models/connection-point.model';
+import { Payment } from '../models/payment.model';
+import { Refund } from '../models/refund.model';
 export declare class User extends Model<User> {
     id: number;
     firstName: string;
@@ -9,7 +12,11 @@ export declare class User extends Model<User> {
     passwordHash: string;
     isConfirmed: boolean;
     banned: boolean;
+    role: UserRole;
     createdAt: Date;
     updatedAt: Date;
-    role: UserRole;
+    deletedAt: Date;
+    connectionPoints: ConnectionPoint[];
+    payments: Payment[];
+    refunds: Refund[];
 }

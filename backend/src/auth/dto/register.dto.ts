@@ -18,7 +18,7 @@ export class RegisterDto {
   @IsNotEmpty()
   phone: string;
 
-  @ApiProperty({ example: '12', description: 'Номер дома пользователя' })
+  @ApiProperty({ example: '42А', description: 'Номер дома' })
   @IsString()
   @IsNotEmpty()
   houseNumber: string;

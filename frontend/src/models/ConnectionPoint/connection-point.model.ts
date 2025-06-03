@@ -1,4 +1,4 @@
-export interface IMinimalClient {
+export interface IConnectionPointMinimalClient {
   id: number;
   firstName: string;
   lastName: string;
@@ -14,11 +14,12 @@ export interface IConnectionPoint {
   type: string;
   positionM: number;
   totalCost: number;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
 }
 
-export interface ICreateConnectionPointDto {
+export interface IConnectionPointCreateDto {
   name: string;
   address: string;
   type: string;
@@ -26,6 +27,4 @@ export interface ICreateConnectionPointDto {
   totalCost: number;
 }
 
-export interface IUpdateConnectionPointDto {
-  point: Partial<IConnectionPoint>;
-} 
+export interface IConnectionPointUpdateDto extends Partial<IConnectionPointCreateDto> {} 

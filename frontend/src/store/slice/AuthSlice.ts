@@ -7,14 +7,19 @@ import {
   clearAuthCookies,
 } from "utils/Cookies";
 
-export interface AuthState {
-  token: string | null;
+export interface IAuthState {
   user: IUser | null;
+  token: string | null;
+  isAuthenticated: boolean;
 }
 
-const initialState: AuthState = {
-  token: getAuthToken(),
-  user: getAuthUser(),
+const token = getAuthToken();
+const user = getAuthUser();
+
+const initialState: IAuthState = {
+  token,
+  user,
+  isAuthenticated: Boolean(token && user),
 };
 
 const authSlice = createSlice({
@@ -29,12 +34,14 @@ const authSlice = createSlice({
       if (token && user) {
         state.token = token;
         state.user = user;
+        state.isAuthenticated = true;
         setAuthCookie(token, user);
       }
     },
     logout: (state) => {      
       state.token = null;
       state.user = null;
+      state.isAuthenticated = false;
       clearAuthCookies();
     },
   },

@@ -4,44 +4,55 @@ import { useLoginMutation } from "services/AuthApi";
 import { useAppDispatch } from "hooks/Redux"; // ваш типизированный useDispatch
 import { setCredentials } from "store/slice/AuthSlice"; // ваш slice
 import { setAuthCookie } from "utils/Cookies";
+import { useNavigate } from 'react-router-dom';
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
-interface LoginFormValues {
+interface ILoginFormValues {
   phone: string;
   password: string;
 }
 
-interface LoginFormProps {
+interface ILoginFormProps {
   isShowModal: boolean;
   setIsShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  onSuccess?: () => void;
+}
+
+interface IErrorResponse {
+  message: string;
 }
 
 export default function LoginForm({
   isShowModal,
   setIsShowModal,
-}: LoginFormProps) {
+  onSuccess,
+}: ILoginFormProps) {
   const [login, { isLoading, error }] = useLoginMutation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const onClose = () => setIsShowModal(false);
 
-  const onFinish = async (values: LoginFormValues) => {
+  const onFinish = async (values: ILoginFormValues) => {
     try {
       // Выполняем мутацию
       const data = await login(values).unwrap();
       // Сохраняем в куку
-      setAuthCookie(data.token, data.user);
+      setAuthCookie(data.access_token, data.user);
 
       // Диспатчим в Redux
       dispatch(
         setCredentials({
-          token: data.token,
+          token: data.access_token,
           user: data.user,
         })
       );
       // Закрываем модалку
       onClose();
-    } catch {
-      // Ошибка отобразится через error → Alert
+      onSuccess?.();
+      navigate('/');
+    } catch (error) {
+      console.error('Login error:', error);
     }
   };
 
@@ -62,8 +73,7 @@ export default function LoginForm({
         {error && (
           <Alert
             message="Ошибка входа"
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            description={(error as any)?.data?.message}
+            description={((error as FetchBaseQueryError).data as IErrorResponse)?.message || 'Произошла ошибка при входе'}
             type="error"
             showIcon
             style={{ marginBottom: 16 }}
@@ -73,9 +83,23 @@ export default function LoginForm({
         <Form.Item
           label="Телефон"
           name="phone"
-          rules={[{ required: true, message: "Пожалуйста, введите телефон" }]}
+          rules={[{ 
+            required: true, 
+            message: "Пожалуйста, введите телефон",
+            pattern: /^8\d{10}$/,
+            transform: (value: string) => {
+              const digits = value.replace(/\D/g, '');
+              if (digits.startsWith('7')) {
+                return '8' + digits.slice(1);
+              }
+              if (!digits.startsWith('8')) {
+                return '8' + digits;
+              }
+              return digits;
+            }
+          }]}
         >
-          <Input placeholder="8 999 999 99 99" />
+          <Input placeholder="89509848017" />
         </Form.Item>
 
         <Form.Item

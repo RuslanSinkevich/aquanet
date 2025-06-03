@@ -1,10 +1,10 @@
-import { UserRole } from 'src/common/enums/user-role.enum';
 export declare class CreateUserDto {
+    phone: string;
     firstName: string;
     lastName: string;
-    phone: string;
     houseNumber: string;
     passwordHash: string;
+    role?: number;
     isConfirmed?: boolean;
-    role?: UserRole;
+    banned?: boolean;
 }

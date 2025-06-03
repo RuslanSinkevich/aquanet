@@ -34,8 +34,7 @@ export const setAuthCookie = (token: string, user: IUser | null) => {
 
 export const getAuthToken = (): string | null => {
   try {
-    const token = Cookies.get(TOKEN_KEY);
-    return token || null;
+    return Cookies.get(TOKEN_KEY) || null;
   } catch (error) {
     console.error('Error getting auth token:', error);
     return null;

@@ -8,23 +8,28 @@ import {
   EnvironmentOutlined,
   DollarOutlined,
   ToolOutlined,
+  ShoppingOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import MenuHome from '../modules/header/MenuHome';
+import { AuthService } from '../services/AuthService';
+import { UserRole } from '../common/enums/user-role.enum';
 
 const { Header, Sider, Content } = Layout;
 
-interface AppLayoutProps {
+interface IAppLayoutProps {
   children: React.ReactNode;
 }
 
-export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+export const AppLayout: React.FC<IAppLayoutProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  const isAdmin = AuthService.hasRole(UserRole.ADMIN);
 
   const menuItems = [
     {
@@ -35,7 +40,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     {
       key: '/scheme',
       icon: <HomeOutlined />,
-      label: 'Схема подключения',
+      label: 'Пример подключения',
     },
     {
       key: '/connection-points',
@@ -57,6 +62,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       icon: <ToolOutlined />,
       label: 'Работы',
     },
+    ...(isAdmin ? [{
+      key: '/materials',
+      icon: <ShoppingOutlined />,
+      label: 'Материалы',
+    }] : []),
   ];
 
   return (

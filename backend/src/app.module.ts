@@ -2,30 +2,30 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { UsersModule } from "./users/users.module";
-import { User } from "./users/users.model";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
 import { AuthModule } from "./auth/auth.module";
 import { ConnectionPointsModule } from "./connection-points/connection-points.module";
-import { ClientsModule } from "./clients/clients.module";
-import { UtilitySegmentsModule } from "./utility-segments/utility-segments.module";
-import { Client } from "./models/client.model";
+import { MaterialsModule } from "./materials/materials.module";
+import { WorkItemsModule } from "./work-items/work-items.module";
+import { PaymentsModule } from "./payments/payments.module";
+import { RefundsModule } from "./refunds/refunds.module";
+import { User } from "./models/user.model";
 import { ConnectionPoint } from "./models/connection-point.model";
-import { PaymentAudit } from "./models/payment-audit.model";
-import { UtilitySegment } from "./models/utility-segment.model";
-import { ClientConnectionPoint } from "./models/client-connection-point.model";
-import { SegmentPayment } from "./models/segment-payment.model";
-import { WorkItem } from "./models/work-item.model";
 import { Material } from "./models/material.model";
+import { WorkItem } from "./models/work-item.model";
+import { UserConnectionPoint } from "./models/user-connection-point.model";
+import { Payment } from "./models/payment.model";
+import { Refund } from "./models/refund.model";
+import configuration from './config/configuration';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ 
+    ConfigModule.forRoot({
+      envFilePath: '.env',
       isGlobal: true,
-      envFilePath: '.env'
+      load: [configuration],
     }),
     SequelizeModule.forRoot({
-      dialect: "postgres",
+      dialect: 'postgres',
       host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT),
       username: process.env.DB_USERNAME,
@@ -33,28 +33,23 @@ import { Material } from "./models/material.model";
       database: process.env.DB_DATABASE,
       models: [
         User,
-        Client,
         ConnectionPoint,
-        PaymentAudit,
-        UtilitySegment,
-        ClientConnectionPoint,
-        SegmentPayment,
+        Material,
         WorkItem,
-        Material
+        UserConnectionPoint,
+        Payment,
+        Refund,
       ],
       autoLoadModels: true,
       synchronize: true,
-      logging: console.log,
-      retryAttempts: 5,
-      retryDelay: 2000,
     }),
     UsersModule,
     AuthModule,
     ConnectionPointsModule,
-    ClientsModule,
-    UtilitySegmentsModule
+    MaterialsModule,
+    WorkItemsModule,
+    PaymentsModule,
+    RefundsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

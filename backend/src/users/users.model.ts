@@ -1,8 +1,16 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany, BelongsToMany } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
-import { UserRole } from "src/common/enums/user-role.enum";
+import { UserRole } from "../common/enums/user-role.enum";
+import { ConnectionPoint } from '../models/connection-point.model';
+import { UserConnectionPoint } from '../models/user-connection-point.model';
+import { Payment } from '../models/payment.model';
+import { Refund } from '../models/refund.model';
 
-@Table({ tableName: 'users' })
+@Table({
+  tableName: 'users',
+  timestamps: true,
+  paranoid: true,
+})
 export class User extends Model<User> {
   @ApiProperty({ example: 1, description: 'Уникальный идентификатор' })
   @Column({
@@ -14,48 +22,49 @@ export class User extends Model<User> {
 
   @ApiProperty({ example: 'Иван', description: 'Имя пользователя' })
   @Column({
-    field: 'first_name',
-    type: DataType.TEXT,
+    type: DataType.STRING,
     allowNull: false,
+    field: 'first_name'
   })
   firstName: string;
 
   @ApiProperty({ example: 'Иванов', description: 'Фамилия пользователя' })
   @Column({
-    field: 'last_name',
-    type: DataType.TEXT,
+    type: DataType.STRING,
     allowNull: false,
+    field: 'last_name'
   })
   lastName: string;
 
-  @ApiProperty({ example: '+79001234567', description: 'Телефон пользователя' })
+  @ApiProperty({ example: '+79001234567', description: 'Номер телефона' })
   @Column({
-    type: DataType.TEXT,
+    type: DataType.STRING,
     allowNull: false,
+    unique: true,
   })
   phone: string;
 
-  @ApiProperty({ example: '12', description: 'Номер дома' })
+  @ApiProperty({ example: '42', description: 'Номер дома' })
   @Column({
-    field: 'house_number',
-    type: DataType.TEXT,
+    type: DataType.STRING,
     allowNull: false,
+    field: 'house_number'
   })
   houseNumber: string;
 
-  @ApiProperty({ example: 'hash123...', description: 'Хеш пароля' })
+  @ApiProperty({ example: 'hashedPassword123', description: 'Хеш пароля' })
   @Column({
-    field: 'password_hash',
-    type: DataType.TEXT,
+    type: DataType.STRING,
     allowNull: false,
+    field: 'password_hash'
   })
   passwordHash: string;
 
   @ApiProperty({ example: false, description: 'Подтвержден ли пользователь' })
   @Column({
-    field: 'is_confirmed',
     type: DataType.BOOLEAN,
     defaultValue: false,
+    field: 'is_confirmed'
   })
   isConfirmed: boolean;
 
@@ -66,31 +75,47 @@ export class User extends Model<User> {
   })
   banned: boolean;
 
-  @ApiProperty({ example: '2024-03-15T12:00:00Z', description: 'Дата создания' })
-  @Column({
-    field: 'created_at',
-    type: DataType.DATE,
-    defaultValue: DataType.NOW,
-  })
-  createdAt: Date;
-
-  @ApiProperty({ example: '2024-03-15T12:00:00Z', description: 'Дата обновления' })
-  @Column({
-    field: 'updated_at',
-    type: DataType.DATE,
-    defaultValue: DataType.NOW,
-  })
-  updatedAt: Date;
-
   @ApiProperty({ 
     example: UserRole.USER, 
-    description: "Роль пользователя (0 - admin, 1 - prorab, 2 - user)",
-    enum: UserRole
+    description: 'Роль пользователя',
+    enum: UserRole,
   })
   @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
+    type: DataType.STRING,
     defaultValue: UserRole.USER,
   })
   role: UserRole;
+
+  @ApiProperty({ example: '2024-03-28T12:00:00Z', description: 'Дата создания' })
+  @Column({
+    type: DataType.DATE,
+    defaultValue: DataType.NOW,
+    field: 'created_at'
+  })
+  createdAt: Date;
+
+  @ApiProperty({ example: '2024-03-28T12:00:00Z', description: 'Дата обновления' })
+  @Column({
+    type: DataType.DATE,
+    defaultValue: DataType.NOW,
+    field: 'updated_at'
+  })
+  updatedAt: Date;
+
+  @ApiProperty({ example: '2024-03-28T12:00:00Z', description: 'Дата удаления' })
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+    field: 'deleted_at'
+  })
+  deletedAt: Date;
+
+  @BelongsToMany(() => ConnectionPoint, () => UserConnectionPoint)
+  connectionPoints: ConnectionPoint[];
+
+  @HasMany(() => Payment)
+  payments: Payment[];
+
+  @HasMany(() => Refund)
+  refunds: Refund[];
 }

@@ -14,6 +14,9 @@ export interface IClient {
     share: number;
     amount: number;
   }[];
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
 }
 
 export interface IClientConnectionPoint {

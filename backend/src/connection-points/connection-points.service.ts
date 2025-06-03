@@ -2,9 +2,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ConnectionPoint } from '../models/connection-point.model';
-import { Client } from '../models/client.model';
+import { User } from '../models/user.model';
 import { WorkItem } from '../models/work-item.model';
-import { UtilitySegment } from '../models/utility-segment.model';
 import { CreateConnectionPointDto } from './dto/create-connection-point.dto';
 import { Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
@@ -15,58 +14,49 @@ export class ConnectionPointsService {
   constructor(
     @InjectModel(ConnectionPoint)
     private connectionPointModel: typeof ConnectionPoint,
-    @InjectModel(Client)
-    private clientModel: typeof Client,
+    @InjectModel(User)
+    private userModel: typeof User,
     @InjectModel(WorkItem)
     private workItemModel: typeof WorkItem,
-    @InjectModel(UtilitySegment)
-    private utilitySegmentModel: typeof UtilitySegment,
     private sequelize: Sequelize,
   ) {}
 
   async create(createDto: CreateConnectionPointDto, transaction?: Transaction) {
-    return this.connectionPointModel.create(createDto, { transaction });
+    const dbData = {
+      name: createDto.name,
+      positionM: createDto.positionM,
+      totalCost: createDto.totalCost,
+      comment: createDto.comment
+    };
+    return this.connectionPointModel.create(dbData, { transaction });
   }
 
   async findAll() {
-    return this.connectionPointModel.findAll({
+    const points = await this.connectionPointModel.findAll({
       include: [
         {
-          model: Client,
-          through: { attributes: [] },
+          model: User,
+          attributes: ['id', 'phone', 'firstName', 'lastName', 'role'],
         },
         {
           model: WorkItem,
-        },
-        {
-          model: UtilitySegment,
-          as: 'outgoingSegments',
-        },
-        {
-          model: UtilitySegment,
-          as: 'incomingSegments',
+          attributes: ['id', 'description', 'cost', 'workDate'],
         },
       ],
     });
+    return points;
   }
 
   async findOne(id: number) {
     const point = await this.connectionPointModel.findByPk(id, {
       include: [
         {
-          model: Client,
-          through: { attributes: [] },
+          model: User,
+          attributes: ['id', 'phone', 'firstName', 'lastName', 'role'],
         },
         {
           model: WorkItem,
-        },
-        {
-          model: UtilitySegment,
-          as: 'outgoingSegments',
-        },
-        {
-          model: UtilitySegment,
-          as: 'incomingSegments',
+          attributes: ['id', 'description', 'cost', 'workDate'],
         },
       ],
     });
@@ -81,7 +71,13 @@ export class ConnectionPointsService {
     if (!point) {
       return null;
     }
-    return point.update(updateDto, { transaction });
+    const dbData = {
+      name: updateDto.name,
+      positionM: updateDto.positionM,
+      totalCost: updateDto.totalCost,
+      comment: updateDto.comment
+    };
+    return point.update(dbData, { transaction });
   }
 
   async remove(id: number, transaction?: Transaction) {
@@ -97,23 +93,23 @@ export class ConnectionPointsService {
     const point = await this.connectionPointModel.findByPk(connectionPointId, {
       include: [
         {
-          model: Client,
-          attributes: ['id'],
+          model: User,
+          attributes: ['id', 'firstName', 'lastName'],
         },
       ],
       transaction,
     });
 
-    if (!point || !point.clients || point.clients.length === 0) {
+    if (!point || !point.users || point.users.length === 0) {
       return null;
     }
 
-    // Базовая доля для каждого клиента
-    const baseShare = 1 / point.clients.length;
+    const baseShare = 1 / point.users.length;
 
-    // Возвращаем массив с долями для каждого клиента
-    return point.clients.map(client => ({
-      clientId: client.id,
+    return point.users.map(user => ({
+      userId: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
       share: baseShare,
       amount: point.totalCost * baseShare,
     }));
@@ -124,10 +120,6 @@ export class ConnectionPointsService {
     if (!shares) {
       return null;
     }
-
-    // Здесь должна быть логика обновления долей в таблице clients_connection_points
-    // и создания записей в payment_audit
-    // TODO: Реализовать позже
 
     return shares;
   }

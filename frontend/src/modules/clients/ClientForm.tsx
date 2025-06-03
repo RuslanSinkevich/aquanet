@@ -11,12 +11,12 @@ import {
   useUpdateClientMutation,
 } from '../../services/ClientsApi';
 
-interface ClientFormProps {
+interface IClientFormProps {
   initialValues?: Partial<IClient>;
   onSuccess: () => void;
 }
 
-export const ClientForm: React.FC<ClientFormProps> = ({
+export const ClientForm: React.FC<IClientFormProps> = ({
   initialValues,
   onSuccess,
 }) => {
@@ -89,11 +89,20 @@ export const ClientForm: React.FC<ClientFormProps> = ({
         rules={[{ 
           required: true, 
           message: 'Пожалуйста, введите телефон',
-          pattern: /^\+7\d{10}$/,
-          transform: (value: string) => value.startsWith('+7') ? value : `+7${value.replace(/\D/g, '')}`
+          pattern: /^8\d{10}$/,
+          transform: (value: string) => {
+            const digits = value.replace(/\D/g, '');
+            if (digits.startsWith('7')) {
+              return '8' + digits.slice(1);
+            }
+            if (!digits.startsWith('8')) {
+              return '8' + digits;
+            }
+            return digits;
+          }
         }]}
       >
-        <Input placeholder="+79991234567" />
+        <Input placeholder="89509848017" />
       </Form.Item>
 
       <Form.Item

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "hooks/Redux";
-import { useGetProfileQuery } from "services/AuthApi";
+import { useMeQuery } from "services/AuthApi";
 import { setCredentials, logout } from "store/slice/AuthSlice";
 import { Routes, Route } from "react-router-dom";
 import { WaterConnectionPage } from './pages/WaterConnectionPage';
@@ -15,7 +15,6 @@ export const AppHome: React.FC = () => {
   const token = useAppSelector((state) => state.auth.token);
   const [ready, setReady] = useState(false);
 
-  // Читаем токен и пользователя из куки только один раз при монтировании
   useEffect(() => {
     if (!token) {
       const tokenFromCookie = getAuthToken();
@@ -28,32 +27,27 @@ export const AppHome: React.FC = () => {
       }
     }
     setReady(true);
-  }, []); // Пустой массив зависимостей
+  }, [dispatch, token]);
 
-  // Запрос профиля — только если токен есть и ready true
   const {
     data: profile,
     error,
     isFetching,
-  } = useGetProfileQuery(undefined, {
+  } = useMeQuery(undefined, {
     skip: !token || !ready,
   });
 
-  // Обновляем данные пользователя или выходим из аккаунта при ошибке
   useEffect(() => {
     if (!token || !ready || isFetching) return;
 
     if (profile) {
       dispatch(setCredentials({ token, user: profile }));
     } else if (error) {
-      console.log("logout");
       dispatch(logout());
     }
-    console.log("token:", token, "ready:", ready);
   }, [token, profile, error, isFetching, ready, dispatch]);
 
   if (!ready) {
-    // Пока читаем куки и не готовы — можно показать загрузку
     return null;
   }
 

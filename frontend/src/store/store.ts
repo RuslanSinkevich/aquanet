@@ -3,6 +3,7 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 import { AuthApi } from '../services/AuthApi';
 import { ConnectionPointsApi } from '../services/ConnectionPointsApi';
 import { ClientsApi } from '../services/ClientsApi';
+import { MaterialsApi } from '../services/MaterialsApi';
 import authReducer from './slice/AuthSlice';
 
 export const store = configureStore({
@@ -11,12 +12,14 @@ export const store = configureStore({
     [AuthApi.reducerPath]: AuthApi.reducer,
     [ConnectionPointsApi.reducerPath]: ConnectionPointsApi.reducer,
     [ClientsApi.reducerPath]: ClientsApi.reducer,
+    [MaterialsApi.reducerPath]: MaterialsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       AuthApi.middleware,
       ConnectionPointsApi.middleware,
       ClientsApi.middleware,
+      MaterialsApi.middleware,
     ),
 });
 

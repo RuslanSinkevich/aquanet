@@ -1,18 +1,20 @@
 import React from 'react';
 import { Form, Input, InputNumber, Button, message } from 'antd';
-import { IConnectionPoint } from '../../models/ConnectionPoint/connection-point.model';
+import { 
+  IConnectionPoint,
+  IConnectionPointCreateDto 
+} from '../../models/ConnectionPoint/connection-point.model';
 import { 
   useCreateConnectionPointMutation,
   useUpdateConnectionPointMutation,
 } from '../../services/ConnectionPointsApi';
-import { ICreateConnectionPointDto } from '../../models/ConnectionPoint/connection-point.model';
 
-interface ConnectionPointFormProps {
+interface IConnectionPointFormProps {
   initialValues?: Partial<IConnectionPoint>;
   onSuccess: () => void;
 }
 
-export const ConnectionPointForm: React.FC<ConnectionPointFormProps> = ({
+export const ConnectionPointForm: React.FC<IConnectionPointFormProps> = ({
   initialValues,
   onSuccess,
 }) => {
@@ -29,7 +31,7 @@ export const ConnectionPointForm: React.FC<ConnectionPointFormProps> = ({
         }).unwrap();
         message.success('Точка подключения успешно обновлена');
       } else {
-        const createDto: ICreateConnectionPointDto = {
+        const createDto: IConnectionPointCreateDto = {
           name: values.name!,
           address: values.address!,
           type: values.type!,

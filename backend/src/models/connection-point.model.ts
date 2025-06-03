@@ -1,13 +1,13 @@
-import { Column, DataType, Model, Table, HasMany, BelongsToMany } from 'sequelize-typescript';
+import { Column, DataType, Model, Table, BelongsToMany, HasMany } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
-import { Client } from './client.model';
+import { User } from './user.model';
+import { UserConnectionPoint } from './user-connection-point.model';
 import { WorkItem } from './work-item.model';
-import { UtilitySegment } from './utility-segment.model';
-import { ClientConnectionPoint } from './client-connection-point.model';
 
 @Table({ 
   tableName: 'connection_points',
-  timestamps: true // Включаем автоматическое управление полями createdAt и updatedAt
+  timestamps: true,
+  paranoid: true
 })
 export class ConnectionPoint extends Model<ConnectionPoint> {
   @ApiProperty({ example: 1, description: 'Уникальный идентификатор точки подключения' })
@@ -18,7 +18,7 @@ export class ConnectionPoint extends Model<ConnectionPoint> {
   })
   id: number;
 
-  @ApiProperty({ example: 'Колодец №1', description: 'Название точки подключения' })
+  @ApiProperty({ example: 'Точка 1', description: 'Название точки подключения' })
   @Column({
     type: DataType.TEXT,
     allowNull: false,
@@ -41,40 +41,44 @@ export class ConnectionPoint extends Model<ConnectionPoint> {
   })
   totalCost: number;
 
-  @ApiProperty({ example: true, description: 'Перераспределять при подключении' })
+  @ApiProperty({ example: 'Комментарий', description: 'Дополнительная информация' })
   @Column({
-    field: 'redistribute_on_join',
-    type: DataType.BOOLEAN,
-    defaultValue: false,
+    type: DataType.TEXT,
+    allowNull: true,
   })
-  redistributeOnJoin: boolean;
+  comment: string;
 
-  @ApiProperty({ example: '2024-03-15T12:00:00Z', description: 'Дата создания записи' })
+  @ApiProperty({ example: '2024-03-15T12:00:00Z', description: 'Дата создания' })
   @Column({
     field: 'created_at',
     type: DataType.DATE,
+    defaultValue: DataType.NOW,
   })
   createdAt: Date;
 
-  @ApiProperty({ example: '2024-03-15T12:00:00Z', description: 'Дата обновления записи' })
+  @ApiProperty({ example: '2024-03-15T12:00:00Z', description: 'Дата обновления' })
   @Column({
     field: 'updated_at',
     type: DataType.DATE,
+    defaultValue: DataType.NOW,
   })
   updatedAt: Date;
 
-  @BelongsToMany(() => Client, () => ClientConnectionPoint)
-  clients: Client[];
+  @ApiProperty({ example: '2024-03-15T12:00:00Z', description: 'Дата удаления' })
+  @Column({
+    field: 'deleted_at',
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  deletedAt: Date;
+
+  @BelongsToMany(() => User, {
+    through: { model: () => UserConnectionPoint },
+    foreignKey: 'connection_point_id',
+    otherKey: 'user_id'
+  })
+  users: User[];
 
   @HasMany(() => WorkItem)
   workItems: WorkItem[];
-
-  @HasMany(() => UtilitySegment, { foreignKey: 'fromPoint', as: 'outgoingSegments' })
-  outgoingSegments: UtilitySegment[];
-
-  @HasMany(() => UtilitySegment, { foreignKey: 'toPoint', as: 'incomingSegments' })
-  incomingSegments: UtilitySegment[];
-
-  @HasMany(() => ClientConnectionPoint)
-  clientConnections: ClientConnectionPoint[];
 } 
