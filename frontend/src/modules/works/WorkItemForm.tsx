@@ -1,8 +1,7 @@
 import React from 'react';
 import { Form, Input, InputNumber, DatePicker, Select, Button, message } from 'antd';
 import { useCreateWorkItemMutation, useUpdateWorkItemMutation } from '../../services/WorkItemsApi';
-import { useGetMaterialsQuery } from '../../services/MaterialsApi';
-import { useGetConnectionPointsQuery } from '../../services/ConnectionPointsApi';
+import { useGetUsersQuery } from '../../services/UsersApi';
 import type { IWorkItem, IWorkItemCreateDto } from '../../models/WorkItem/work-item.model';
 import dayjs from 'dayjs';
 
@@ -15,21 +14,26 @@ export const WorkItemForm: React.FC<WorkItemFormProps> = ({ initialValues, onSuc
   const [form] = Form.useForm();
   const [createWorkItem] = useCreateWorkItemMutation();
   const [updateWorkItem] = useUpdateWorkItemMutation();
-  const { data: materials } = useGetMaterialsQuery();
-  const { data: connectionPoints } = useGetConnectionPointsQuery();
+  const { data: users } = useGetUsersQuery();
 
   const handleSubmit = async (values: IWorkItemCreateDto) => {
     try {
+      const submitData = {
+        ...values,
+        workDate: values.workDate ? dayjs(values.workDate).toISOString() : undefined
+      };
+
       if (initialValues) {
-        await updateWorkItem({ id: initialValues.id, workItem: values }).unwrap();
+        await updateWorkItem({ id: initialValues.id, workItem: submitData }).unwrap();
         message.success('Работа успешно обновлена');
       } else {
-        await createWorkItem(values).unwrap();
+        await createWorkItem(submitData).unwrap();
         message.success('Работа успешно создана');
       }
       form.resetFields();
       onSuccess?.();
-    } catch {
+    } catch (error) {
+      console.error('Error submitting work item:', error);
       message.error('Произошла ошибка при сохранении работы');
     }
   };
@@ -45,24 +49,6 @@ export const WorkItemForm: React.FC<WorkItemFormProps> = ({ initialValues, onSuc
       } : undefined}
     >
       <Form.Item
-        name="connectionPointId"
-        label="Точка подключения"
-        rules={[{ required: true, message: 'Пожалуйста, выберите точку подключения' }]}
-      >
-        <Select
-          showSearch
-          placeholder="Выберите точку подключения"
-          optionFilterProp="children"
-        >
-          {connectionPoints?.map(point => (
-            <Select.Option key={point.id} value={point.id}>
-              {point.address}
-            </Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
-
-      <Form.Item
         name="description"
         label="Описание работы"
         rules={[{ required: true, message: 'Пожалуйста, введите описание работы' }]}
@@ -71,29 +57,11 @@ export const WorkItemForm: React.FC<WorkItemFormProps> = ({ initialValues, onSuc
       </Form.Item>
 
       <Form.Item
-        name="materialId"
-        label="Материал"
-        rules={[{ required: true, message: 'Пожалуйста, выберите материал' }]}
-      >
-        <Select
-          showSearch
-          placeholder="Выберите материал"
-          optionFilterProp="children"
-        >
-          {materials?.map(material => (
-            <Select.Option key={material.id} value={material.id}>
-              {material.type} ({material.unit})
-            </Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
-
-      <Form.Item
-        name="quantity"
-        label="Количество"
+        name="cost"
+        label="Стоимость"
         rules={[
-          { required: true, message: 'Пожалуйста, введите количество' },
-          { type: 'number', min: 0, message: 'Количество должно быть положительным числом' }
+          { required: true, message: 'Пожалуйста, введите стоимость' },
+          { type: 'number', min: 0, message: 'Стоимость должна быть положительным числом' }
         ]}
       >
         <InputNumber style={{ width: '100%' }} />
@@ -101,15 +69,19 @@ export const WorkItemForm: React.FC<WorkItemFormProps> = ({ initialValues, onSuc
 
       <Form.Item
         name="userIds"
-        label="Исполнители"
-        rules={[{ required: true, message: 'Пожалуйста, выберите исполнителей' }]}
+        label="Участники оплаты"
+        rules={[{ required: true, message: 'Пожалуйста, выберите участников оплаты' }]}
       >
         <Select
           mode="multiple"
-          placeholder="Выберите исполнителей"
+          placeholder="Выберите участников оплаты"
           optionFilterProp="children"
         >
-          {/* Здесь нужно будет добавить список пользователей */}
+          {users?.map(user => (
+            <Select.Option key={user.id} value={user.id}>
+              {user.firstName} {user.lastName}
+            </Select.Option>
+          ))}
         </Select>
       </Form.Item>
 
@@ -117,7 +89,10 @@ export const WorkItemForm: React.FC<WorkItemFormProps> = ({ initialValues, onSuc
         name="workDate"
         label="Дата выполнения"
       >
-        <DatePicker style={{ width: '100%' }} />
+        <DatePicker 
+          style={{ width: '100%' }}
+          format="DD.MM.YYYY"
+        />
       </Form.Item>
 
       <Form.Item

@@ -1,11 +1,8 @@
 export interface IWorkItem {
   id: number;
-  connectionPointId: number;
-  description: string;
-  materialId: number;
-  quantity: number;
   cost: number;
   userIds: number[];
+  description: string;
   comment?: string;
   workDate?: string;
   docLinks?: string[];
@@ -15,22 +12,18 @@ export interface IWorkItem {
 }
 
 export interface IWorkItemCreateDto {
-  connectionPointId: number;
-  description: string;
-  materialId: number;
-  quantity: number;
+  cost: number;
   userIds: number[];
+  description: string;
   comment?: string;
   workDate?: string;
   docLinks?: string[];
 }
 
 export interface IWorkItemUpdateDto {
-  connectionPointId?: number;
-  description?: string;
-  materialId?: number;
-  quantity?: number;
+  cost?: number;
   userIds?: number[];
+  description?: string;
   comment?: string;
   workDate?: string;
   docLinks?: string[];

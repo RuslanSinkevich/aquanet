@@ -22,12 +22,11 @@ export class WorkItem extends Model<WorkItem> {
   @Column({
     field: 'connection_point_id',
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: 'connection_points',
       key: 'id'
-    },
-    onDelete: 'CASCADE'
+    }
   })
   connectionPointId: number;
 

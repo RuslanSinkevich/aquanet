@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Table, Button, Space, Modal, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useGetWorkItemsQuery, useDeleteWorkItemMutation } from '../../services/WorkItemsApi';
+import { useGetUsersQuery } from '../../services/UsersApi';
 import { WorkItemForm } from './WorkItemForm';
 import type { IWorkItem } from '../../models/WorkItem/work-item.model';
 import dayjs from 'dayjs';
@@ -10,7 +11,16 @@ export const WorkItemsList: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedWorkItem, setSelectedWorkItem] = useState<IWorkItem | null>(null);
   const { data: workItems, isLoading, refetch } = useGetWorkItemsQuery();
+  const { data: users } = useGetUsersQuery();
   const [deleteWorkItem] = useDeleteWorkItemMutation();
+
+  const getUserNames = (userIds: number[]) => {
+    return userIds
+      .map(id => users?.find(user => user.id === id))
+      .filter(Boolean)
+      .map(user => `${user?.firstName} ${user?.lastName}`)
+      .join(', ');
+  };
 
   const handleAdd = () => {
     setSelectedWorkItem(null);
@@ -34,36 +44,27 @@ export const WorkItemsList: React.FC = () => {
 
   const columns = [
     {
-      title: 'Точка подключения',
-      dataIndex: ['connectionPoint', 'address'],
-      key: 'connectionPoint',
-    },
-    {
-      title: 'Описание',
-      dataIndex: 'description',
-      key: 'description',
-    },
-    {
-      title: 'Материал',
-      dataIndex: ['material', 'type'],
-      key: 'material',
-    },
-    {
-      title: 'Количество',
-      dataIndex: 'quantity',
-      key: 'quantity',
-    },
-    {
       title: 'Стоимость',
       dataIndex: 'cost',
       key: 'cost',
       render: (value: number) => `₽ ${value.toLocaleString()}`,
     },
     {
+      title: 'Участники оплаты',
+      dataIndex: 'userIds',
+      key: 'userIds',
+      render: (userIds: number[]) => getUserNames(userIds),
+    },
+    {
       title: 'Дата выполнения',
       dataIndex: 'workDate',
       key: 'workDate',
       render: (value: string) => value ? dayjs(value).format('DD.MM.YYYY') : '-',
+    },
+    {
+      title: 'Комментарий',
+      dataIndex: 'comment',
+      key: 'comment',
     },
     {
       title: 'Действия',
