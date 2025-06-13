@@ -17,6 +17,11 @@ export class CreatePaymentDto {
   @IsNotEmpty()
   paymentDate: Date;
 
+  @ApiProperty({ example: 'https://example.com/receipt.pdf', description: 'Ссылка на документ' })
+  @IsString()
+  @IsOptional()
+  docLink?: string;
+
   @ApiProperty({ example: 'Комментарий', description: 'Дополнительная информация' })
   @IsString()
   @IsOptional()

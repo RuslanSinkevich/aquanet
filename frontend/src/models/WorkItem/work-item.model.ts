@@ -5,7 +5,7 @@ export interface IWorkItem {
   description: string;
   comment?: string;
   workDate?: string;
-  docLinks?: string[];
+  docLinks: string[];
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
@@ -17,7 +17,7 @@ export interface IWorkItemCreateDto {
   description: string;
   comment?: string;
   workDate?: string;
-  docLinks?: string[];
+  docLinks: string[];
 }
 
 export interface IWorkItemUpdateDto {
