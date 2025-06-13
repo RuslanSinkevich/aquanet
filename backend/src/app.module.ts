@@ -15,7 +15,9 @@ import { WorkItem } from "./models/work-item.model";
 import { UserConnectionPoint } from "./models/user-connection-point.model";
 import { Payment } from "./models/payment.model";
 import { Refund } from "./models/refund.model";
+import { Client } from "./clients/entities/client.entity";
 import configuration from './config/configuration';
+import { ClientsModule } from './clients/clients.module';
 
 @Module({
   imports: [
@@ -39,6 +41,7 @@ import configuration from './config/configuration';
         UserConnectionPoint,
         Payment,
         Refund,
+        Client,
       ],
       autoLoadModels: true,
       synchronize: true,
@@ -50,6 +53,7 @@ import configuration from './config/configuration';
     WorkItemsModule,
     PaymentsModule,
     RefundsModule,
+    ClientsModule,
   ],
 })
 export class AppModule {}

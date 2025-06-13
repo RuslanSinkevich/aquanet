@@ -1,50 +1,53 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import { 
+import { createApi } from '@reduxjs/toolkit/query/react';
+import baseQueryWithReauth from './BaseQuery';
+import type { 
   IClient, 
   ICreateClientDto, 
   IUpdateClientDto 
-} from "../models/Client/client.model";
-import baseQueryWithReauth from "./BaseQuery";
+} from '../models/Client/client.model';
 
 export const ClientsApi = createApi({
-  reducerPath: "clientsApi",
+  reducerPath: 'clientsApi',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['Client'],
+  tagTypes: ['Clients'],
   endpoints: (builder) => ({
     getClients: builder.query<IClient[], void>({
-      query: () => "clients",
-      providesTags: ['Client'],
+      query: () => 'clients',
+      providesTags: ['Clients'],
     }),
 
     getClient: builder.query<IClient, number>({
       query: (id) => `clients/${id}`,
-      providesTags: ['Client'],
+      providesTags: (_result, _error, id) => [{ type: 'Clients', id }],
     }),
 
     createClient: builder.mutation<IClient, ICreateClientDto>({
-      query: (data) => ({
-        url: "clients",
-        method: "POST",
-        body: data,
+      query: (client) => ({
+        url: 'clients',
+        method: 'POST',
+        body: client,
       }),
-      invalidatesTags: ['Client'],
+      invalidatesTags: ['Clients'],
     }),
 
-    updateClient: builder.mutation<IClient, { id: number; data: IUpdateClientDto }>({
-      query: ({ id, data }) => ({
+    updateClient: builder.mutation<IClient, { id: number; client: IUpdateClientDto }>({
+      query: ({ id, client }) => ({
         url: `clients/${id}`,
-        method: "PUT",
-        body: data,
+        method: 'PATCH',
+        body: client,
       }),
-      invalidatesTags: ['Client'],
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: 'Clients', id },
+        'Clients',
+      ],
     }),
 
     deleteClient: builder.mutation<void, number>({
       query: (id) => ({
         url: `clients/${id}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: ['Client'],
+      invalidatesTags: ['Clients'],
     }),
   }),
 });

@@ -44,8 +44,8 @@ export const MaterialsList: React.FC = () => {
     },
     {
       title: 'Стоимость за единицу',
-      dataIndex: 'unit_cost',
-      key: 'unit_cost',
+      dataIndex: 'unitCost',
+      key: 'unitCost',
       render: (value: number) => `₽ ${value.toLocaleString()}`,
     },
     {

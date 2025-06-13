@@ -3,60 +3,42 @@ import { Form, Input, Button, message } from 'antd';
 import { 
   IClient, 
   ICreateClientDto, 
-  IUpdateClientDto, 
-  IClientConnectionPoint 
+  IUpdateClientDto
 } from '../../models/Client/client.model';
 import { 
   useCreateClientMutation,
-  useUpdateClientMutation,
+  useUpdateClientMutation
 } from '../../services/ClientsApi';
 
-interface IClientFormProps {
+interface ClientFormProps {
   initialValues?: Partial<IClient>;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
-export const ClientForm: React.FC<IClientFormProps> = ({
-  initialValues,
-  onSuccess,
+export const ClientForm: React.FC<ClientFormProps> = ({ 
+  initialValues, 
+  onSuccess 
 }) => {
-  const [form] = Form.useForm<ICreateClientDto>();
-  const [createClient, { isLoading: isCreating }] = useCreateClientMutation();
-  const [updateClient, { isLoading: isUpdating }] = useUpdateClientMutation();
+  const [form] = Form.useForm();
+  const [createClient] = useCreateClientMutation();
+  const [updateClient] = useUpdateClientMutation();
 
-  const handleSubmit = async (values: ICreateClientDto) => {
+  const onFinish = async (values: ICreateClientDto | IUpdateClientDto) => {
     try {
       if (initialValues?.id) {
-        const connectionPoints = (initialValues.connectionPoints || []).map(cp => ({
-          clientId: initialValues.id!,
-          connectionPointId: cp.id,
-          paymentShare: 0,
-          isInitial: true,
-          joinedAt: new Date().toISOString()
-        })) as IClientConnectionPoint[];
-
-        const updateData: IUpdateClientDto = {
-          client: values,
-          connectionPoints
-        };
-
         await updateClient({ 
           id: initialValues.id, 
-          data: updateData
+          client: values as IUpdateClientDto
         }).unwrap();
         message.success('Клиент успешно обновлен');
       } else {
-        await createClient(values).unwrap();
+        await createClient(values as ICreateClientDto).unwrap();
         message.success('Клиент успешно создан');
       }
       form.resetFields();
-      onSuccess();
+      onSuccess?.();
     } catch {
-      message.error(
-        initialValues?.id
-          ? 'Ошибка при обновлении клиента'
-          : 'Ошибка при создании клиента'
-      );
+      message.error('Произошла ошибка при сохранении клиента');
     }
   };
 
@@ -64,7 +46,7 @@ export const ClientForm: React.FC<IClientFormProps> = ({
     <Form
       form={form}
       layout="vertical"
-      onFinish={handleSubmit}
+      onFinish={onFinish}
       initialValues={initialValues}
     >
       <Form.Item
@@ -86,40 +68,21 @@ export const ClientForm: React.FC<IClientFormProps> = ({
       <Form.Item
         name="phone"
         label="Телефон"
-        rules={[{ 
-          required: true, 
-          message: 'Пожалуйста, введите телефон',
-          pattern: /^8\d{10}$/,
-          transform: (value: string) => {
-            const digits = value.replace(/\D/g, '');
-            if (digits.startsWith('7')) {
-              return '8' + digits.slice(1);
-            }
-            if (!digits.startsWith('8')) {
-              return '8' + digits;
-            }
-            return digits;
-          }
-        }]}
+        rules={[{ required: true, message: 'Пожалуйста, введите телефон' }]}
       >
-        <Input placeholder="89509848017" />
+        <Input />
       </Form.Item>
 
       <Form.Item
-        name="houseNumber"
-        label="Номер дома"
-        rules={[{ required: true, message: 'Пожалуйста, введите номер дома' }]}
+        name="address"
+        label="Адрес"
+        rules={[{ required: true, message: 'Пожалуйста, введите адрес' }]}
       >
         <Input />
       </Form.Item>
 
       <Form.Item>
-        <Button 
-          type="primary" 
-          htmlType="submit"
-          loading={isCreating || isUpdating}
-          block
-        >
+        <Button type="primary" htmlType="submit">
           {initialValues?.id ? 'Обновить' : 'Создать'}
         </Button>
       </Form.Item>

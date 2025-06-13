@@ -33,4 +33,9 @@ export interface IMaterialCreateDto {
   comment?: string;
 }
 
-export interface IMaterialUpdateDto extends Partial<IMaterialCreateDto> {} 
+export interface IMaterialUpdateDto {
+  type?: string;
+  unit?: string;
+  unitCost?: number;
+  comment?: string;
+} 

@@ -6,13 +6,16 @@ import { Routes, Route } from "react-router-dom";
 import { WaterConnectionPage } from './pages/WaterConnectionPage';
 import { ConnectionPointsList } from './modules/connection-points/ConnectionPointsList';
 import { ClientsList } from './modules/clients/ClientsList';
+import { MaterialsList } from './modules/materials/MaterialsList';
+import { WorkItemsList } from './modules/works/WorkItemsList';
 import WaterConnectionInfo from './modules/info/WaterConnectionScheme';
 import { AppLayout } from './components/AppLayout';
 import { getAuthToken, getAuthUser } from "utils/Cookies";
+import { RootState } from 'store/store';
 
 export const AppHome: React.FC = () => {
   const dispatch = useAppDispatch();
-  const token = useAppSelector((state) => state.auth.token);
+  const token = useAppSelector((state: RootState) => state.auth.token);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -31,23 +34,29 @@ export const AppHome: React.FC = () => {
 
   const {
     data: profile,
-    error,
+    error: meError,
     isFetching,
+    isLoading: isMeLoading,
+    isSuccess: isMeSuccess,
+    isError: isMeErrorOcurred
   } = useMeQuery(undefined, {
     skip: !token || !ready,
   });
 
   useEffect(() => {
-    if (!token || !ready || isFetching) return;
+    if (!token || !ready || isFetching || isMeLoading) {
+      return;
+    }
 
-    if (profile) {
+    if (profile && isMeSuccess) {
       dispatch(setCredentials({ token, user: profile }));
-    } else if (error) {
+    } else if (meError && isMeErrorOcurred) {
+      console.warn("Error during /auth/me request, logging out:", meError);
       dispatch(logout());
     }
-  }, [token, profile, error, isFetching, ready, dispatch]);
+  }, [token, profile, meError, isFetching, isMeLoading, isMeSuccess, isMeErrorOcurred, ready, dispatch]);
 
-  if (!ready) {
+  if (!ready && !token) {
     return null;
   }
 
@@ -58,8 +67,9 @@ export const AppHome: React.FC = () => {
         <Route path="/scheme" element={<WaterConnectionInfo />} />
         <Route path="/connection-points" element={<ConnectionPointsList />} />
         <Route path="/clients" element={<ClientsList />} />
+        <Route path="/materials" element={<MaterialsList />} />
+        <Route path="/works" element={<WorkItemsList />} />
         <Route path="/payments" element={<div>Платежи - в разработке</div>} />
-        <Route path="/works" element={<div>Работы - в разработке</div>} />
       </Routes>
     </AppLayout>
   );

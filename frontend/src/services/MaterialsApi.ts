@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import baseQuery from './BaseQuery';
+import baseQueryWithReauth from './BaseQuery';
 import type { 
   IMaterial, 
   IMaterialCreateDto, 
@@ -8,7 +8,7 @@ import type {
 
 export const MaterialsApi = createApi({
   reducerPath: 'materialsApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   tagTypes: ['Materials'],
   endpoints: (builder) => ({
     getMaterials: builder.query<IMaterial[], void>({

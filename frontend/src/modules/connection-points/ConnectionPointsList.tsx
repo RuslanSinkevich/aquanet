@@ -67,13 +67,20 @@ export const ConnectionPointsList: React.FC = () => {
       <Space size="middle">
         {isAdmin && (
           <>
-            <Button onClick={() => {
-              setEditingPoint(record);
-              setIsModalVisible(true);
-            }}>
+            <Button 
+              type="link"
+              onClick={() => {
+                setEditingPoint(record);
+                setIsModalVisible(true);
+              }}
+            >
               Редактировать
             </Button>
-            <Button danger onClick={() => handleDelete(record.id)}>
+            <Button 
+              danger 
+              type="link"
+              onClick={() => handleDelete(record.id)}
+            >
               Удалить
             </Button>
           </>

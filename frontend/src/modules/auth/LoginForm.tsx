@@ -38,12 +38,12 @@ export default function LoginForm({
       // Выполняем мутацию
       const data = await login(values).unwrap();
       // Сохраняем в куку
-      setAuthCookie(data.access_token, data.user);
+      setAuthCookie(data.token, data.user);
 
       // Диспатчим в Redux
       dispatch(
         setCredentials({
-          token: data.access_token,
+          token: data.token,
           user: data.user,
         })
       );

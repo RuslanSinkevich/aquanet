@@ -18,11 +18,18 @@ export const AuthApi = createApi({
       onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
-          const token = data.access_token;
-          setAuthCookie(token, data.user);
-          dispatch(setCredentials({ token, user: data.user }));
+          const tokenToStore = data.token;
+
+          if (tokenToStore) {
+            setAuthCookie(tokenToStore, data.user);
+            dispatch(setCredentials({ token: tokenToStore, user: data.user }));
+          } else {
+            // Можно добавить обработку ошибки, если токен критически важен и не пришел
+            console.error("[AuthApi Login] Token from backend was undefined/null.");
+          }
         } catch (error) {
-          console.error('Login error:', error);
+          // Можно добавить более специфичную обработку ошибок, например, показывать уведомление пользователю
+          console.error('[AuthApi Login] Login error in onQueryStarted:', error);
         }
       },
     }),

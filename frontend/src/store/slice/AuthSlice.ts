@@ -3,7 +3,6 @@ import type { IUser } from "models/Users/user.model";
 import {
   getAuthToken,
   getAuthUser,
-  setAuthCookie,
   clearAuthCookies,
 } from "utils/Cookies";
 
@@ -13,13 +12,13 @@ export interface IAuthState {
   isAuthenticated: boolean;
 }
 
-const token = getAuthToken();
-const user = getAuthUser();
+const initialToken = getAuthToken();
+const initialUser = getAuthUser();
 
 const initialState: IAuthState = {
-  token,
-  user,
-  isAuthenticated: Boolean(token && user),
+  token: initialToken,
+  user: initialUser,
+  isAuthenticated: !!(initialToken && initialUser),
 };
 
 const authSlice = createSlice({
@@ -28,17 +27,13 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ token: string; user: IUser | null }>
+      action: PayloadAction<{ token: string | null; user: IUser | null }>
     ) => {
-      const { token, user } = action.payload;
-      if (token && user) {
-        state.token = token;
-        state.user = user;
-        state.isAuthenticated = true;
-        setAuthCookie(token, user);
-      }
+      state.token = action.payload.token;
+      state.user = action.payload.user;
+      state.isAuthenticated = !!(action.payload.token && action.payload.user);
     },
-    logout: (state) => {      
+    logout: (state) => {
       state.token = null;
       state.user = null;
       state.isAuthenticated = false;

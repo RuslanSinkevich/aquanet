@@ -1,25 +1,37 @@
 export interface IWorkItem {
   id: number;
-  name: string;
-  description?: string;
+  connectionPointId: number;
+  description: string;
+  materialId: number;
+  quantity: number;
   cost: number;
-  status: string;
-  dueDate?: string;
+  userIds: number[];
+  comment?: string;
+  workDate?: string;
+  docLinks?: string[];
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
 }
 
 export interface IWorkItemCreateDto {
-  name: string;
-  description?: string;
-  cost: number;
   connectionPointId: number;
+  description: string;
+  materialId: number;
+  quantity: number;
+  userIds: number[];
+  comment?: string;
+  workDate?: string;
+  docLinks?: string[];
 }
 
 export interface IWorkItemUpdateDto {
-  name?: string;
-  description?: string;
-  cost?: number;
   connectionPointId?: number;
+  description?: string;
+  materialId?: number;
+  quantity?: number;
+  userIds?: number[];
+  comment?: string;
+  workDate?: string;
+  docLinks?: string[];
 } 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, InputNumber, Button, message } from 'antd';
+import { Form, Input, InputNumber, Button, message, Select } from 'antd';
 import { 
   IConnectionPoint,
   IConnectionPointCreateDto 
@@ -13,6 +13,14 @@ interface IConnectionPointFormProps {
   initialValues?: Partial<IConnectionPoint>;
   onSuccess: () => void;
 }
+
+const CONNECTION_POINT_TYPES = [
+  { label: 'Водоснабжение', value: 'WATER' },
+  { label: 'Канализация', value: 'SEWAGE' },
+  { label: 'Электричество', value: 'ELECTRICITY' },
+  { label: 'Газ', value: 'GAS' },
+  { label: 'Отопление', value: 'HEATING' },
+];
 
 export const ConnectionPointForm: React.FC<IConnectionPointFormProps> = ({
   initialValues,
@@ -77,10 +85,13 @@ export const ConnectionPointForm: React.FC<IConnectionPointFormProps> = ({
 
       <Form.Item
         name="type"
-        label="Тип"
-        rules={[{ required: true, message: 'Пожалуйста, укажите тип' }]}
+        label="Тип подключения"
+        rules={[{ required: true, message: 'Пожалуйста, выберите тип подключения' }]}
       >
-        <Input />
+        <Select
+          options={CONNECTION_POINT_TYPES}
+          placeholder="Выберите тип подключения"
+        />
       </Form.Item>
 
       <Form.Item

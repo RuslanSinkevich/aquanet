@@ -7,7 +7,7 @@ export interface IAuthLoginRequest {
 }
 
 export interface IAuthLoginResponse {
-  access_token: string;
+  token: string;
   user: IUser;
 }
 

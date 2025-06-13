@@ -1,48 +1,146 @@
 import React, { useState } from 'react';
-import { Table, Button, Space, Modal, message } from 'antd';
+import { Table, Button, Space, Modal, message, Tag, Dropdown } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, MoreOutlined, CheckOutlined, StopOutlined, UnlockOutlined, LockOutlined } from '@ant-design/icons';
 import { ClientForm } from './ClientForm';
 import { IClient } from '../../models/Client/client.model';
 import { 
   useGetClientsQuery, 
-  useDeleteClientMutation 
+  useDeleteClientMutation,
+  useUpdateClientMutation
 } from '../../services/ClientsApi';
 import { AuthService } from '../../services/AuthService';
 import { UserRole } from '../../common/enums/user-role.enum';
 
 export const ClientsList: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingClient, setEditingClient] = useState<Partial<IClient> | undefined>(undefined);
-
-  const { data: clients = [], isLoading, error } = useGetClientsQuery();
+  const [selectedClient, setSelectedClient] = useState<IClient | null>(null);
+  const { data: clients, isLoading, refetch } = useGetClientsQuery();
   const [deleteClient] = useDeleteClientMutation();
+  const [updateClient] = useUpdateClientMutation();
 
   const isAdmin = AuthService.hasRole(UserRole.ADMIN);
-  const isAuthorized = AuthService.isAuthenticated();
+  const isForeman = AuthService.hasRole(UserRole.PRORAB);
 
-  if (error) {
-    console.error('Error loading clients:', error);
-    return <div>Ошибка загрузки данных. Пожалуйста, обновите страницу.</div>;
-  }
+  const handleAdd = () => {
+    setSelectedClient(null);
+    setIsModalVisible(true);
+  };
+
+  const handleEdit = (client: IClient) => {
+    setSelectedClient(client);
+    setIsModalVisible(true);
+  };
 
   const handleDelete = async (id: number) => {
     try {
       await deleteClient(id).unwrap();
       message.success('Клиент успешно удален');
+      refetch();
     } catch {
       message.error('Ошибка при удалении клиента');
     }
   };
 
-  const baseColumns = [
+  const handleToggleBan = async (client: IClient) => {
+    try {
+      await updateClient({
+        id: client.id,
+        client: { 
+          firstName: client.firstName,
+          lastName: client.lastName,
+          phone: client.phone,
+          address: client.address,
+          banned: !client.banned 
+        }
+      }).unwrap();
+      message.success(`Клиент ${client.banned ? 'разблокирован' : 'заблокирован'}`);
+      refetch();
+    } catch {
+      message.error('Ошибка при изменении статуса блокировки');
+    }
+  };
+
+  const handleToggleConfirm = async (client: IClient) => {
+    try {
+      await updateClient({
+        id: client.id,
+        client: { 
+          firstName: client.firstName,
+          lastName: client.lastName,
+          phone: client.phone,
+          address: client.address,
+          isConfirmed: !client.isConfirmed 
+        }
+      }).unwrap();
+      message.success(`Клиент ${client.isConfirmed ? 'отклонен' : 'подтвержден'}`);
+      refetch();
+    } catch {
+      message.error('Ошибка при изменении статуса подтверждения');
+    }
+  };
+
+  const getRoleTag = (role: number) => {
+    switch (role) {
+      case 0:
+        return <Tag color="red">Админ</Tag>;
+      case 1:
+        return <Tag color="blue">Прораб</Tag>;
+      case 2:
+        return <Tag color="green">Пользователь</Tag>;
+      default:
+        return <Tag>Неизвестно</Tag>;
+    }
+  };
+
+  const getAdminMenuItems = (client: IClient) => [
     {
-      title: 'Имя',
-      dataIndex: 'firstName',
-      key: 'firstName',
+      key: 'edit',
+      label: 'Редактировать',
+      icon: <EditOutlined />,
+      onClick: () => handleEdit(client),
     },
     {
-      title: 'Фамилия',
-      dataIndex: 'lastName',
-      key: 'lastName',
+      key: 'confirm',
+      label: client.isConfirmed ? 'Отклонить' : 'Подтвердить',
+      icon: client.isConfirmed ? <StopOutlined /> : <CheckOutlined />,
+      onClick: () => handleToggleConfirm(client),
+    },
+    {
+      key: 'ban',
+      label: client.banned ? 'Разблокировать' : 'Заблокировать',
+      icon: client.banned ? <UnlockOutlined /> : <LockOutlined />,
+      onClick: () => handleToggleBan(client),
+    },
+    {
+      key: 'delete',
+      label: 'Удалить',
+      icon: <DeleteOutlined />,
+      danger: true,
+      onClick: () => handleDelete(client.id),
+    },
+  ];
+
+  const getForemanMenuItems = (client: IClient) => [
+    {
+      key: 'edit',
+      label: 'Редактировать',
+      icon: <EditOutlined />,
+      onClick: () => handleEdit(client),
+    },
+    {
+      key: 'confirm',
+      label: client.isConfirmed ? 'Отклонить' : 'Подтвердить',
+      icon: client.isConfirmed ? <StopOutlined /> : <CheckOutlined />,
+      onClick: () => handleToggleConfirm(client),
+    },
+  ];
+
+  const columns = [
+    {
+      title: 'ФИО',
+      key: 'fullName',
+      render: (record: IClient) => 
+        `${record.lastName} ${record.firstName}`.trim(),
     },
     {
       title: 'Телефон',
@@ -50,80 +148,82 @@ export const ClientsList: React.FC = () => {
       key: 'phone',
     },
     {
-      title: 'Номер дома',
+      title: 'Адрес',
       dataIndex: 'houseNumber',
       key: 'houseNumber',
     },
     {
-      title: 'Позиция (м)',
-      dataIndex: 'positionM',
-      key: 'positionM',
-      render: (value: number | null | undefined) => value !== null && value !== undefined ? value.toFixed(1) : '-',
+      title: 'Роль',
+      dataIndex: 'role',
+      key: 'role',
+      render: (role: number) => getRoleTag(role),
+    },
+    {
+      title: 'Статус',
+      key: 'status',
+      render: (record: IClient) => (
+        <Space>
+          {record.isConfirmed ? (
+            <Tag color="success">Подтвержден</Tag>
+          ) : (
+            <Tag color="warning">Не подтвержден</Tag>
+          )}
+          {record.banned && <Tag color="error">Заблокирован</Tag>}
+        </Space>
+      ),
+    },
+    {
+      title: 'Действия',
+      key: 'actions',
+      render: (_: unknown, record: IClient) => {
+        if (!isAdmin && !isForeman) return null;
+        
+        const menuItems = isAdmin 
+          ? getAdminMenuItems(record)
+          : getForemanMenuItems(record);
+
+        return (
+          <Dropdown menu={{ items: menuItems }} trigger={['click']}>
+            <Button icon={<MoreOutlined />} />
+          </Dropdown>
+        );
+      },
     },
   ];
 
-  const actionColumn = {
-    title: 'Действия',
-    key: 'actions',
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    render: (_: unknown, record: any) => {
-      const fullClient = clients.find(c => c.id === record.id);
-      return (
-        <Space size="middle">
-          {isAdmin && (
-            <>
-              <Button onClick={() => {
-                setEditingClient(fullClient);
-                setIsModalVisible(true);
-              }}>
-                Редактировать
-              </Button>
-              <Button danger onClick={() => handleDelete(record.id)}>
-                Удалить
-              </Button>
-            </>
-          )}
-        </Space>
-      );
-    },
-  };
-
-  const columns = [...baseColumns, ...(isAuthorized ? [actionColumn] : [])];
-
   return (
     <div>
-      {isAdmin && (
-        <Button 
-          type="primary" 
-          onClick={() => {
-            setEditingClient(undefined);
-            setIsModalVisible(true);
-          }}
-          style={{ marginBottom: 16 }}
-        >
-          Добавить клиента
-        </Button>
+      {(isAdmin || isForeman) && (
+        <div style={{ marginBottom: 16 }}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAdd}
+          >
+            Добавить клиента
+          </Button>
+        </div>
       )}
 
-      <Table 
-        dataSource={clients} 
-        columns={columns} 
-        rowKey="id"
+      <Table
+        columns={columns}
+        dataSource={clients}
         loading={isLoading}
+        rowKey="id"
       />
 
       <Modal
-        title={editingClient ? "Редактировать клиента" : "Добавить клиента"}
+        title={selectedClient ? 'Редактировать клиента' : 'Добавить клиента'}
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
-        destroyOnClose
+        width={800}
       >
         <ClientForm
-          initialValues={editingClient}
+          initialValues={selectedClient || undefined}
           onSuccess={() => {
             setIsModalVisible(false);
-            setEditingClient(undefined);
+            refetch();
           }}
         />
       </Modal>

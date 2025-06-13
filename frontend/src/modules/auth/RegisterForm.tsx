@@ -34,8 +34,8 @@ export const RegisterForm: React.FC<IRegisterFormProps> = ({ onSuccess }) => {
         password: values.password
       }).unwrap();
       
-      setAuthCookie(loginData.access_token, loginData.user);
-      dispatch(setCredentials({ token: loginData.access_token, user: loginData.user }));
+      setAuthCookie(loginData.token, loginData.user);
+      dispatch(setCredentials({ token: loginData.token, user: loginData.user }));
       
       form.resetFields();
       if (onSuccess) {

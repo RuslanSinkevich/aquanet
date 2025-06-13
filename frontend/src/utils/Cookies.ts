@@ -19,13 +19,17 @@ export const getCookie = <T>(name: string): T | undefined => {
 const TOKEN_KEY = "access_token";
 const USER_KEY = "user";
 
-export const setAuthCookie = (token: string, user: IUser | null) => {
+export const setAuthCookie = (token: string | null, user: IUser | null) => {
   try {
     if (token) {
       Cookies.set(TOKEN_KEY, token, { expires: 1 }); // 1 день
+    } else {
+      Cookies.remove(TOKEN_KEY); // Если токен null, удаляем его
     }
     if (user) {
       Cookies.set(USER_KEY, JSON.stringify(user), { expires: 1 });
+    } else {
+      Cookies.remove(USER_KEY); // Если пользователь null, удаляем его
     }
   } catch (error) {
     console.error('Error setting auth cookies:', error);
