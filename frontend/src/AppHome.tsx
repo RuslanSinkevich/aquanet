@@ -12,6 +12,7 @@ import WaterConnectionInfo from './modules/info/WaterConnectionScheme';
 import { AppLayout } from './components/AppLayout';
 import { getAuthToken, getAuthUser } from "utils/Cookies";
 import { RootState } from 'store/store';
+import { PaymentsList } from './modules/payments/PaymentsList';
 
 export const AppHome: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -69,7 +70,7 @@ export const AppHome: React.FC = () => {
         <Route path="/clients" element={<ClientsList />} />
         <Route path="/materials" element={<MaterialsList />} />
         <Route path="/works" element={<WorkItemsList />} />
-        <Route path="/payments" element={<div>Платежи - в разработке</div>} />
+        <Route path="/payments" element={<PaymentsList />} />
       </Routes>
     </AppLayout>
   );
