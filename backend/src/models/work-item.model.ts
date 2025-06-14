@@ -5,7 +5,8 @@ import { ConnectionPoint } from './connection-point.model';
 
 @Table({ 
   tableName: 'work_items',
-  timestamps: true // Включаем автоматическое управление полями createdAt и updatedAt
+  timestamps: true,
+  paranoid: true
 })
 export class WorkItem extends Model<WorkItem> {
   @ApiProperty({ example: 1, description: 'Уникальный идентификатор работы' })
@@ -21,10 +22,15 @@ export class WorkItem extends Model<WorkItem> {
   @Column({
     field: 'connection_point_id',
     type: DataType.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'connection_points',
+      key: 'id'
+    }
   })
   connectionPointId: number;
 
-  @ApiProperty({ example: 'Установка бетонного кольца', description: 'Описание работы или материала' })
+  @ApiProperty({ example: 'Установка бетонного кольца', description: 'Описание работы' })
   @Column({
     type: DataType.TEXT,
     allowNull: false,
@@ -36,12 +42,17 @@ export class WorkItem extends Model<WorkItem> {
   @Column({
     field: 'material_id',
     type: DataType.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'materials',
+      key: 'id'
+    }
   })
   materialId: number;
 
   @ApiProperty({ example: 2, description: 'Количество' })
   @Column({
-    type: DataType.DECIMAL,
+    type: DataType.DECIMAL(10, 2),
     validate: {
       min: 0,
     },
@@ -50,7 +61,7 @@ export class WorkItem extends Model<WorkItem> {
 
   @ApiProperty({ example: 2000.00, description: 'Итоговая стоимость' })
   @Column({
-    type: DataType.DECIMAL,
+    type: DataType.DECIMAL(10, 2),
     allowNull: false,
     validate: {
       min: 0,
@@ -58,10 +69,42 @@ export class WorkItem extends Model<WorkItem> {
   })
   cost: number;
 
+  @ApiProperty({ example: [1, 2, 3], description: 'ID пользователей-участников оплаты' })
+  @Column({
+    field: 'user_ids',
+    type: DataType.ARRAY(DataType.INTEGER),
+    allowNull: false,
+  })
+  userIds: number[];
+
+  @ApiProperty({ example: 'Комментарий', description: 'Дополнительная информация' })
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  comment: string;
+
+  @ApiProperty({ example: '2024-03-15', description: 'Дата фактической работы' })
+  @Column({
+    field: 'work_date',
+    type: DataType.DATEONLY,
+    allowNull: true,
+  })
+  workDate: Date;
+
+  @ApiProperty({ example: ['https://example.com/doc1.pdf'], description: 'Ссылки на документы/чеки' })
+  @Column({
+    field: 'doc_links',
+    type: DataType.ARRAY(DataType.TEXT),
+    allowNull: true,
+  })
+  docLinks: string[];
+
   @ApiProperty({ example: '2024-03-15T12:00:00Z', description: 'Дата создания' })
   @Column({
     field: 'created_at',
     type: DataType.DATE,
+    defaultValue: DataType.NOW,
   })
   createdAt: Date;
 
@@ -69,12 +112,27 @@ export class WorkItem extends Model<WorkItem> {
   @Column({
     field: 'updated_at',
     type: DataType.DATE,
+    defaultValue: DataType.NOW,
   })
   updatedAt: Date;
 
-  @BelongsTo(() => ConnectionPoint)
+  @ApiProperty({ example: '2024-03-15T12:00:00Z', description: 'Дата удаления' })
+  @Column({
+    field: 'deleted_at',
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  deletedAt: Date;
+
+  @BelongsTo(() => ConnectionPoint, {
+    foreignKey: 'connection_point_id',
+    targetKey: 'id'
+  })
   connectionPoint: ConnectionPoint;
 
-  @BelongsTo(() => Material)
+  @BelongsTo(() => Material, {
+    foreignKey: 'material_id',
+    targetKey: 'id'
+  })
   material: Material;
 } 

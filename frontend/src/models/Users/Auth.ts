@@ -1,16 +1,22 @@
 import { IUser } from "./user.model";
+import { UserRole } from "../../common/enums/user-role.enum";
 
-export interface ILoginRequest {
+export interface IAuthLoginRequest {
   phone: string;
   password: string;
 }
 
-export interface ILoginResponse {
+export interface IAuthLoginResponse {
   token: string;
   user: IUser;
 }
 
-export interface IRegisterRequest extends Omit<IUser, "id" | "createdAt"> {
+export interface IAuthRegisterRequest {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  houseNumber: string;
   password: string;
+  role?: UserRole;
 }
   

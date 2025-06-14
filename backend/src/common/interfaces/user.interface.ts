@@ -1,4 +1,4 @@
-export interface IUser {
+export interface User {
   id: number;
   firstName: string;
   lastName: string;
@@ -6,5 +6,8 @@ export interface IUser {
   houseNumber: string;
   isConfirmed: boolean;
   banned: boolean;
-  password?: string;
+  role: number;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date;
 }

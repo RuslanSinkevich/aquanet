@@ -15,10 +15,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const sequelize_1 = require("@nestjs/sequelize");
-const users_model_1 = require("./users.model");
+const user_model_1 = require("../models/user.model");
 let UsersService = class UsersService {
     constructor(userModel) {
         this.userModel = userModel;
+    }
+    async findByPhone(phone) {
+        return this.userModel.findOne({
+            where: {
+                phone,
+            }
+        });
     }
     async create(createUserDto) {
         return this.userModel.create(createUserDto);
@@ -27,30 +34,29 @@ let UsersService = class UsersService {
         return this.userModel.findAll();
     }
     async findOne(id) {
-        return this.userModel.findByPk(id);
-    }
-    async findByPhone(phone) {
-        return this.userModel.findOne({ where: { phone } });
+        const user = await this.userModel.findByPk(id);
+        return user;
     }
     async update(id, updateUserDto) {
-        return this.userModel.update(updateUserDto, {
-            where: { id },
-            returning: true,
-        });
+        const user = await this.findOne(id);
+        if (!user) {
+            throw new common_1.NotFoundException(`Пользователь с ID ${id} не найден для обновления`);
+        }
+        return user.update(updateUserDto);
     }
     async remove(id) {
-        return this.userModel.destroy({
-            where: { id },
-        });
-    }
-    async confirmUser(id) {
-        await this.userModel.update({ isConfirmed: true }, { where: { id } });
+        const user = await this.findOne(id);
+        if (!user) {
+            throw new common_1.NotFoundException(`Пользователь с ID ${id} не найден для удаления`);
+        }
+        await user.destroy();
+        return { message: "Пользователь успешно удален" };
     }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, sequelize_1.InjectModel)(users_model_1.User)),
+    __param(0, (0, sequelize_1.InjectModel)(user_model_1.User)),
     __metadata("design:paramtypes", [Object])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map

@@ -2,12 +2,8 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { ConfigService } from "@nestjs/config";
-import { IUser } from "src/common/interfaces/user.interface";
 import { UsersService } from '../users/users.service';
 
-export interface IPayload {
-  user: IUser
-}
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -27,12 +23,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException();
     }
-    // Возвращаем объект пользователя с id и ролью для использования в guards
+    // Возвращаем объект пользователя, который будет доступен в req.user
     return { 
       id: user.id, 
-      role: user.role,
+      phone: user.phone,  
       firstName: user.firstName,
-      lastName: user.lastName
+      lastName: user.lastName,
+      houseNumber: user.houseNumber,
+      role: user.role,
+      isConfirmed: user.isConfirmed,
+      banned: user.banned,
     };
   }
 }

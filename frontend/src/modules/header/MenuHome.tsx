@@ -104,6 +104,7 @@ export default function MenuHome() {
           <LoginForm
             setIsShowModal={setIsModalLoginForm}
             isShowModal={isModalLoginForm}
+            onSuccess={() => setIsModalLoginForm(false)}
           />
           <Modal
             title="Регистрация"

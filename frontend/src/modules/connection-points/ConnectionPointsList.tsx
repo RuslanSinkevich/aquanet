@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Table, Button, Space, Modal, message } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { ConnectionPointForm } from './ConnectionPointForm';
 import type { IConnectionPoint } from '../../models/ConnectionPoint/connection-point.model';
 import { 
@@ -13,7 +14,7 @@ export const ConnectionPointsList: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingPoint, setEditingPoint] = useState<Partial<IConnectionPoint> | undefined>(undefined);
 
-  const { data: points = [], isLoading, error } = useGetConnectionPointsQuery();
+  const { data: points = [], isLoading, error, refetch } = useGetConnectionPointsQuery();
   const [deletePoint] = useDeleteConnectionPointMutation();
 
   const isAdmin = AuthService.hasRole(UserRole.ADMIN);
@@ -24,10 +25,21 @@ export const ConnectionPointsList: React.FC = () => {
     return <div>Ошибка загрузки данных. Пожалуйста, обновите страницу.</div>;
   }
 
+  const handleAdd = () => {
+    setEditingPoint(undefined);
+    setIsModalVisible(true);
+  };
+
+  const handleEdit = (point: IConnectionPoint) => {
+    setEditingPoint(point);
+    setIsModalVisible(true);
+  };
+
   const handleDelete = async (id: number) => {
     try {
       await deletePoint(id).unwrap();
       message.success('Точка подключения успешно удалена');
+      refetch();
     } catch (error) {
       console.error('Error deleting connection point:', error);
       message.error('Ошибка при удалении точки подключения');
@@ -64,16 +76,21 @@ export const ConnectionPointsList: React.FC = () => {
     title: 'Действия',
     key: 'actions',
     render: (_: unknown, record: IConnectionPoint) => (
-      <Space size="middle">
+      <Space>
         {isAdmin && (
           <>
-            <Button onClick={() => {
-              setEditingPoint(record);
-              setIsModalVisible(true);
-            }}>
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record)}
+            >
               Редактировать
             </Button>
-            <Button danger onClick={() => handleDelete(record.id)}>
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(record.id)}
+            >
               Удалить
             </Button>
           </>
@@ -87,16 +104,15 @@ export const ConnectionPointsList: React.FC = () => {
   return (
     <div>
       {isAdmin && (
-        <Button 
-          type="primary" 
-          onClick={() => {
-            setEditingPoint(undefined);
-            setIsModalVisible(true);
-          }}
-          style={{ marginBottom: 16 }}
-        >
-          Добавить точку подключения
-        </Button>
+        <div style={{ marginBottom: 16 }}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAdd}
+          >
+            Добавить точку подключения
+          </Button>
+        </div>
       )}
 
       <Table 
@@ -111,6 +127,7 @@ export const ConnectionPointsList: React.FC = () => {
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
+        width={800}
         destroyOnClose
       >
         <ConnectionPointForm
@@ -118,6 +135,7 @@ export const ConnectionPointsList: React.FC = () => {
           onSuccess={() => {
             setIsModalVisible(false);
             setEditingPoint(undefined);
+            refetch();
           }}
         />
       </Modal>

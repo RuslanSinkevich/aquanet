@@ -1,8 +1,11 @@
-import { Column, DataType, Model, Table, HasMany } from 'sequelize-typescript';
+import { Column, DataType, Model, Table } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
-import { WorkItem } from './work-item.model';
 
-@Table({ tableName: 'materials' })
+@Table({ 
+  tableName: 'materials',
+  timestamps: true,
+  paranoid: true
+})
 export class Material extends Model<Material> {
   @ApiProperty({ example: 1, description: 'Уникальный идентификатор материала' })
   @Column({
@@ -12,7 +15,7 @@ export class Material extends Model<Material> {
   })
   id: number;
 
-  @ApiProperty({ example: 'Бетонное кольцо', description: 'Тип материала' })
+  @ApiProperty({ example: 'Труба ПНД', description: 'Тип материала' })
   @Column({
     type: DataType.TEXT,
     allowNull: false,
@@ -29,7 +32,7 @@ export class Material extends Model<Material> {
   @ApiProperty({ example: 1000.00, description: 'Стоимость за единицу' })
   @Column({
     field: 'unit_cost',
-    type: DataType.DECIMAL,
+    type: DataType.DECIMAL(10, 2),
     allowNull: false,
     validate: {
       min: 0,
@@ -37,6 +40,34 @@ export class Material extends Model<Material> {
   })
   unitCost: number;
 
-  @HasMany(() => WorkItem)
-  workItems: WorkItem[];
+  @ApiProperty({ example: 'Комментарий', description: 'Дополнительная информация' })
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  comment: string;
+
+  @ApiProperty({ example: '2024-03-15T12:00:00Z', description: 'Дата создания' })
+  @Column({
+    field: 'created_at',
+    type: DataType.DATE,
+    defaultValue: DataType.NOW,
+  })
+  createdAt: Date;
+
+  @ApiProperty({ example: '2024-03-15T12:00:00Z', description: 'Дата обновления' })
+  @Column({
+    field: 'updated_at',
+    type: DataType.DATE,
+    defaultValue: DataType.NOW,
+  })
+  updatedAt: Date;
+
+  @ApiProperty({ example: '2024-03-15T12:00:00Z', description: 'Дата удаления' })
+  @Column({
+    field: 'deleted_at',
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  deletedAt: Date;
 } 

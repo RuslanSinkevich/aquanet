@@ -41,4 +41,13 @@ export class CreateConnectionPointDto {
   @IsBoolean()
   @IsOptional()
   redistributeOnJoin?: boolean;
+
+  @ApiProperty({
+    example: "Комментарий к точке подключения",
+    description: "Дополнительная информация",
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  comment?: string;
 }

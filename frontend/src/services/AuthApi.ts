@@ -1,20 +1,15 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import type { ILoginRequest, IRegisterRequest } from "models/Users/Auth";
+import type { IAuthLoginRequest, IAuthRegisterRequest, IAuthLoginResponse } from "models/Users/Auth";
 import { setAuthCookie } from "../utils/Cookies";
 import { setCredentials } from "../store/slice/AuthSlice";
 import baseQuery from "./BaseQuery";
 import { IUser } from "models/Users/user.model";
 
-interface LoginResponse {
-  token: string;
-  user: IUser;
-}
-
 export const AuthApi = createApi({
   reducerPath: "authApi",
   baseQuery: baseQuery,
   endpoints: (builder) => ({
-    login: builder.mutation<LoginResponse, ILoginRequest>({
+    login: builder.mutation<IAuthLoginResponse, IAuthLoginRequest>({
       query: (credentials) => ({
         url: "auth/login",
         method: "POST",
@@ -23,21 +18,28 @@ export const AuthApi = createApi({
       onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
-          setAuthCookie(data.token, data.user);
-          dispatch(setCredentials(data));
-        } catch {
-          // Handle error
+          const tokenToStore = data.token;
+
+          if (tokenToStore) {
+            setAuthCookie(tokenToStore, data.user);
+            dispatch(setCredentials({ token: tokenToStore, user: data.user }));
+          } else {
+            // Можно добавить обработку ошибки, если токен критически важен и не пришел
+            console.error("[AuthApi Login] Token from backend was undefined/null.");
+          }
+        } catch (error) {
+          // Можно добавить более специфичную обработку ошибок, например, показывать уведомление пользователю
+          console.error('[AuthApi Login] Login error in onQueryStarted:', error);
         }
       },
     }),
 
-    getProfile: builder.query<IUser, void>({
-      query: () => "auth/me", // ваш URL для получения текущего пользователя
-      // не сохраняем навсегда в кеше, чтобы всегда проверять актуальность:
+    me: builder.query<IUser, void>({
+      query: () => "auth/me",
       keepUnusedDataFor: 0,
     }),
 
-    register: builder.mutation<void, IRegisterRequest>({
+    register: builder.mutation<void, IAuthRegisterRequest>({
       query: (data) => ({
         url: "auth/register",
         method: "POST",
@@ -47,5 +49,4 @@ export const AuthApi = createApi({
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useGetProfileQuery } =
-  AuthApi;
+export const { useLoginMutation, useRegisterMutation, useMeQuery } = AuthApi;

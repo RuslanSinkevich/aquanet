@@ -1,11 +1,14 @@
-import { Column, DataType, Model, Table, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Column, DataType, Model, Table, BelongsTo, ForeignKey } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
-import { Client } from './client.model';
-import { UtilitySegment } from './utility-segment.model';
+import { User } from './user.model';
 
-@Table({ tableName: 'segment_payments' })
+@Table({ 
+  tableName: 'segment_payments',
+  timestamps: true,
+  paranoid: true
+})
 export class SegmentPayment extends Model<SegmentPayment> {
-  @ApiProperty({ example: 1, description: 'Уникальный идентификатор оплаты' })
+  @ApiProperty({ example: 1, description: 'Уникальный идентификатор платежа' })
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,
@@ -13,44 +16,73 @@ export class SegmentPayment extends Model<SegmentPayment> {
   })
   id: number;
 
-  @ApiProperty({ example: 1, description: 'ID клиента' })
-  @ForeignKey(() => Client)
+  @ApiProperty({ example: 1, description: 'ID пользователя' })
+  @ForeignKey(() => User)
   @Column({
-    field: 'client_id',
     type: DataType.INTEGER,
+    allowNull: false,
+    field: 'user_id',
   })
-  clientId: number;
+  userId: number;
 
-  @ApiProperty({ example: 1, description: 'ID сегмента' })
-  @ForeignKey(() => UtilitySegment)
+  @ApiProperty({ example: 2500.00, description: 'Сумма платежа' })
   @Column({
-    field: 'segment_id',
-    type: DataType.INTEGER,
-  })
-  segmentId: number;
-
-  @ApiProperty({ example: 0.25, description: 'Доля оплаты' })
-  @Column({
-    type: DataType.DECIMAL,
-    validate: {
-      min: 0,
-      max: 1,
-    },
-  })
-  share: number;
-
-  @ApiProperty({ example: 2500.00, description: 'Сумма оплаты' })
-  @Column({
-    type: DataType.DECIMAL,
+    type: DataType.DECIMAL(10, 2),
+    allowNull: false,
     validate: {
       min: 0,
     },
   })
   amount: number;
 
-  @BelongsTo(() => Client)
-  client: Client;
+  @ApiProperty({ example: '2024-03-15', description: 'Дата платежа' })
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+    field: 'payment_date',
+    defaultValue: DataType.NOW,
+  })
+  paymentDate: Date;
 
-  @BelongsTo(() => UtilitySegment)
-  segment: UtilitySegment;
+  @ApiProperty({ example: 'https://example.com/document.pdf', description: 'Ссылка на документ' })
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+    field: 'doc_link',
+  })
+  docLink?: string;
+
+  @ApiProperty({ example: 'Комментарий к платежу', description: 'Комментарий к платежу' })
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  comment?: string;
+
+  @ApiProperty({ example: '2024-03-15T12:00:00Z', description: 'Дата создания' })
+  @Column({
+    field: 'created_at',
+    type: DataType.DATE,
+    defaultValue: DataType.NOW,
+  })
+  createdAt: Date;
+
+  @ApiProperty({ example: '2024-03-15T12:00:00Z', description: 'Дата обновления' })
+  @Column({
+    field: 'updated_at',
+    type: DataType.DATE,
+    defaultValue: DataType.NOW,
+  })
+  updatedAt: Date;
+
+  @ApiProperty({ example: '2024-03-15T12:00:00Z', description: 'Дата удаления' })
+  @Column({
+    field: 'deleted_at',
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  deletedAt: Date;
+
+  @BelongsTo(() => User)
+  user: User;
 } 

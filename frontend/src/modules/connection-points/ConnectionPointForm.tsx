@@ -1,18 +1,21 @@
 import React from 'react';
 import { Form, Input, InputNumber, Button, message } from 'antd';
-import { IConnectionPoint } from '../../models/ConnectionPoint/connection-point.model';
+import { 
+  IConnectionPoint,
+  IConnectionPointCreateDto,
+  IConnectionPointUpdateDto
+} from '../../models/ConnectionPoint/connection-point.model';
 import { 
   useCreateConnectionPointMutation,
   useUpdateConnectionPointMutation,
 } from '../../services/ConnectionPointsApi';
-import { ICreateConnectionPointDto } from '../../models/ConnectionPoint/connection-point.model';
 
-interface ConnectionPointFormProps {
+interface IConnectionPointFormProps {
   initialValues?: Partial<IConnectionPoint>;
   onSuccess: () => void;
 }
 
-export const ConnectionPointForm: React.FC<ConnectionPointFormProps> = ({
+export const ConnectionPointForm: React.FC<IConnectionPointFormProps> = ({
   initialValues,
   onSuccess,
 }) => {
@@ -23,25 +26,31 @@ export const ConnectionPointForm: React.FC<ConnectionPointFormProps> = ({
   const handleSubmit = async (values: Partial<IConnectionPoint>) => {
     try {
       if (initialValues?.id) {
+        const updateDto: IConnectionPointUpdateDto = {
+          name: values.name,
+          positionM: values.positionM,
+          totalCost: values.totalCost,
+          comment: values.comment,
+        };
         await updatePoint({ 
           id: initialValues.id, 
-          point: values 
+          point: updateDto 
         }).unwrap();
         message.success('Точка подключения успешно обновлена');
       } else {
-        const createDto: ICreateConnectionPointDto = {
+        const createDto: IConnectionPointCreateDto = {
           name: values.name!,
-          address: values.address!,
-          type: values.type!,
           positionM: values.positionM || 0,
           totalCost: values.totalCost || 0,
+          comment: values.comment,
         };
         await createPoint(createDto).unwrap();
         message.success('Точка подключения успешно создана');
       }
       form.resetFields();
       onSuccess();
-    } catch {
+    } catch (error) {
+      console.error('Error:', error);
       message.error(
         initialValues?.id
           ? 'Ошибка при обновлении точки подключения'
@@ -61,22 +70,6 @@ export const ConnectionPointForm: React.FC<ConnectionPointFormProps> = ({
         name="name"
         label="Название"
         rules={[{ required: true, message: 'Пожалуйста, введите название' }]}
-      >
-        <Input />
-      </Form.Item>
-
-      <Form.Item
-        name="address"
-        label="Адрес"
-        rules={[{ required: true, message: 'Пожалуйста, введите адрес' }]}
-      >
-        <Input />
-      </Form.Item>
-
-      <Form.Item
-        name="type"
-        label="Тип"
-        rules={[{ required: true, message: 'Пожалуйста, укажите тип' }]}
       >
         <Input />
       </Form.Item>
@@ -104,6 +97,13 @@ export const ConnectionPointForm: React.FC<ConnectionPointFormProps> = ({
             return parsed ? Number(parsed) : 0;
           }}
         />
+      </Form.Item>
+
+      <Form.Item
+        name="comment"
+        label="Комментарий"
+      >
+        <Input.TextArea rows={4} />
       </Form.Item>
 
       <Form.Item>

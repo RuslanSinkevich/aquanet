@@ -13,17 +13,49 @@ import { AppHome } from "./AppHome";
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: 20 }}>
+          <h1>Что-то пошло не так</h1>
+          <p>{this.state.error?.message}</p>
+          <button onClick={() => window.location.reload()}>
+            Перезагрузить страницу
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 root.render(
-  /**StrictMode позволяет находить распространенные ошибки в компонентах на ранних этапах разработки. */
-  //<React.StrictMode>
-  <App>
-    <Provider store={store}>
-      <ConfigProvider theme={getThemeConfig()} locale={locale}>
-        <BrowserRouter>
-          <AppHome />
-        </BrowserRouter>
-      </ConfigProvider>
-    </Provider>
-  </App>
-  //</React.StrictMode>
+  <ErrorBoundary>
+    <React.StrictMode>
+      <App>
+        <Provider store={store}>
+          <ConfigProvider theme={getThemeConfig()} locale={locale}>
+            <BrowserRouter>
+              <AppHome />
+            </BrowserRouter>
+          </ConfigProvider>
+        </Provider>
+      </App>
+    </React.StrictMode>
+  </ErrorBoundary>
 );

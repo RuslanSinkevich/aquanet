@@ -1,1 +1,1 @@
-export type InputType=  "text" | "number" | "select" | "string";
+export type IInputType = "text" | "number" | "select" | "string";

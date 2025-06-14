@@ -1,28 +1,49 @@
 import React from "react";
-import { Form, Input, Button, message } from "antd";
-import { IRegisterRequest } from "models/Users/Auth";
-import { useRegisterMutation } from "../../services/AuthApi";
+import { Form, Input, Button, message, Alert } from "antd";
+import { IAuthRegisterRequest } from "models/Users/Auth";
+import { useRegisterMutation, useLoginMutation } from "../../services/AuthApi";
 import { useNavigate } from 'react-router-dom';
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { useAppDispatch } from "hooks/Redux";
+import { setCredentials } from "store/slice/AuthSlice";
+import { setAuthCookie } from "utils/Cookies";
 
-interface RegisterFormProps {
-  onSuccess?: () => void;
+interface IRegisterFormProps {
+  onSuccess: () => void;
 }
 
-export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
-  const [form] = Form.useForm<IRegisterRequest>();
-  const [register, { isLoading }] = useRegisterMutation();
-  const navigate = useNavigate();
+interface IErrorResponse {
+  message: string;
+}
 
-  const handleSubmit = async (values: IRegisterRequest) => {
+export const RegisterForm: React.FC<IRegisterFormProps> = ({ onSuccess }) => {
+  const [form] = Form.useForm<IAuthRegisterRequest>();
+  const [register, { isLoading: isRegistering, error }] = useRegisterMutation();
+  const [login, { isLoading: isLoggingIn }] = useLoginMutation();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  const handleSubmit = async (values: IAuthRegisterRequest) => {
     try {
       await register(values).unwrap();
       message.success('Регистрация успешна');
+      
+      // Автоматически входим после регистрации
+      const loginData = await login({
+        phone: values.phone,
+        password: values.password
+      }).unwrap();
+      
+      setAuthCookie(loginData.token, loginData.user);
+      dispatch(setCredentials({ token: loginData.token, user: loginData.user }));
+      
       form.resetFields();
       if (onSuccess) {
         onSuccess();
       }
       navigate('/');
-    } catch {
+    } catch (error) {
+      console.error('Registration error:', error);
       message.error('Ошибка при регистрации');
     }
   };
@@ -33,6 +54,16 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       layout="vertical"
       onFinish={handleSubmit}
     >
+      {error && (
+        <Alert
+          message="Ошибка регистрации"
+          description={((error as FetchBaseQueryError).data as IErrorResponse)?.message || 'Произошла ошибка при регистрации'}
+          type="error"
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+      )}
+
       <Form.Item
         name="firstName"
         label="Имя"
@@ -55,17 +86,29 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         rules={[{ 
           required: true, 
           message: 'Пожалуйста, введите телефон',
-          pattern: /^\+7\d{10}$/,
-          transform: (value: string) => value.startsWith('+7') ? value : `+7${value.replace(/\D/g, '')}`
+          pattern: /^8\d{10}$/,
+          transform: (value: string) => {
+            const digits = value.replace(/\D/g, '');
+            if (digits.startsWith('7')) {
+              return '8' + digits.slice(1);
+            }
+            if (!digits.startsWith('8')) {
+              return '8' + digits;
+            }
+            return digits;
+          }
         }]}
       >
-        <Input placeholder="+79991234567" />
+        <Input placeholder="89509848017" />
       </Form.Item>
 
       <Form.Item
         name="password"
         label="Пароль"
-        rules={[{ required: true, message: 'Пожалуйста, введите пароль' }]}
+        rules={[
+          { required: true, message: 'Пожалуйста, введите пароль' },
+          { min: 6, message: 'Пароль должен быть не менее 6 символов' }
+        ]}
       >
         <Input.Password />
       </Form.Item>
@@ -82,7 +125,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         <Button 
           type="primary" 
           htmlType="submit"
-          loading={isLoading}
+          loading={isRegistering || isLoggingIn}
           block
         >
           Зарегистрироваться

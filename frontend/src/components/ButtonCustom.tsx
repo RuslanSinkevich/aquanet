@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { LiteralUnion } from "utils/Helpers";
 
 // Типы для ButtonCustomProps
-interface ButtonCustomProps {
+interface IButtonCustomProps {
   /** Текст внутри кнопки */
   children: React.ReactNode;
   /** Обработчик клика */
@@ -15,6 +15,16 @@ interface ButtonCustomProps {
   style?: React.CSSProperties;
   /** Дополнительный класс для кнопки */
   className?: string;
+  /** Тип кнопки */
+  type?: 'primary' | 'default' | 'dashed' | 'text' | 'link';
+  /** Флаг опасности */
+  danger?: boolean;
+  /** Флаг загрузки */
+  loading?: boolean;
+  /** Флаг блока */
+  block?: boolean;
+  /** HTML-тип кнопки */
+  htmlType?: 'button' | 'submit' | 'reset';
 }
 
 // Вспомогательные функции для определения стилей
@@ -51,7 +61,7 @@ export default function ButtonCustom({
   disabled = false,
   style = {},
   className,
-}: ButtonCustomProps) {
+}: IButtonCustomProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   // Определяем базовые стили
