@@ -24,9 +24,7 @@ const work_item_model_1 = require("./models/work-item.model");
 const user_connection_point_model_1 = require("./models/user-connection-point.model");
 const payment_model_1 = require("./models/payment.model");
 const refund_model_1 = require("./models/refund.model");
-const client_entity_1 = require("./clients/entities/client.entity");
 const configuration_1 = require("./config/configuration");
-const clients_module_1 = require("./clients/clients.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -53,7 +51,6 @@ exports.AppModule = AppModule = __decorate([
                     user_connection_point_model_1.UserConnectionPoint,
                     payment_model_1.Payment,
                     refund_model_1.Refund,
-                    client_entity_1.Client,
                 ],
                 autoLoadModels: true,
                 synchronize: true,
@@ -65,7 +62,6 @@ exports.AppModule = AppModule = __decorate([
             work_items_module_1.WorkItemsModule,
             payments_module_1.PaymentsModule,
             refunds_module_1.RefundsModule,
-            clients_module_1.ClientsModule,
         ],
     })
 ], AppModule);

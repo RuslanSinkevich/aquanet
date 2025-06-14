@@ -28,6 +28,7 @@ import { Public } from "src/auth/public.decorator";
 import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
 import { UserRole } from "src/common/enums/user-role.enum";
+import { User } from "../models/user.model";
 
 @ApiTags("Точки подключения")
 @ApiBearerAuth('JWT-auth')
@@ -137,5 +138,28 @@ export class ConnectionPointsController {
   @ApiResponse({ status: 200 })
   recalculateShares(@Param("id") id: string) {
     return this.service.recalculateShares(+id);
+  }
+
+  @Post(":id/users/:userId")
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: "Добавить пользователя к точке подключения" })
+  @ApiResponse({ status: 200, description: "Пользователь успешно добавлен к точке подключения" })
+  addUser(@Param("id") id: string, @Param("userId") userId: string) {
+    return this.service.addUser(+id, +userId);
+  }
+
+  @Delete(":id/users/:userId")
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: "Удалить пользователя из точки подключения" })
+  @ApiResponse({ status: 200, description: "Пользователь успешно удален из точки подключения" })
+  removeUser(@Param("id") id: string, @Param("userId") userId: string) {
+    return this.service.removeUser(+id, +userId);
+  }
+
+  @Get(":id/users")
+  @ApiOperation({ summary: "Получить всех пользователей точки подключения" })
+  @ApiResponse({ status: 200, description: "Возвращает всех пользователей точки подключения", type: [User] })
+  getUsers(@Param("id") id: string) {
+    return this.service.getUsers(+id);
   }
 }

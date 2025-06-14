@@ -1,19 +1,18 @@
-export interface IConnectionPointMinimalClient {
+export interface IConnectionPointMinimalUser {
   id: number;
   firstName: string;
   lastName: string;
   phone: string;
   houseNumber: string;
-  positionM: number;
 }
 
 export interface IConnectionPoint {
   id: number;
   name: string;
-  address: string;
-  type: string;
   positionM: number;
   totalCost: number;
+  comment?: string;
+  users: IConnectionPointMinimalUser[];
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
@@ -21,10 +20,14 @@ export interface IConnectionPoint {
 
 export interface IConnectionPointCreateDto {
   name: string;
-  address: string;
-  type: string;
   positionM: number;
   totalCost: number;
+  comment?: string;
 }
 
-export interface IConnectionPointUpdateDto extends Partial<IConnectionPointCreateDto> {} 
+export interface IConnectionPointUpdateDto {
+  name?: string;
+  positionM?: number;
+  totalCost?: number;
+  comment?: string;
+} 

@@ -4,7 +4,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   HomeOutlined,
-  TeamOutlined,
+  UserOutlined,
   EnvironmentOutlined,
   DollarOutlined,
   ToolOutlined,
@@ -48,8 +48,8 @@ export const AppLayout: React.FC<IAppLayoutProps> = ({ children }) => {
       label: 'Точки подключения',
     },
     {
-      key: '/clients',
-      icon: <TeamOutlined />,
+      key: '/users',
+      icon: <UserOutlined />,
       label: 'Клиенты',
     },
     {

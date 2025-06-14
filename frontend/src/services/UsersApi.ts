@@ -1,19 +1,10 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { IUser, IUserCreateDto, IUserUpdateDto } from '../models/Users/user.model';
-import { getAuthToken } from '../utils/Cookies';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { IUser, IUserCreateDto, IUserUpdateDto } from '../models/Users/user.model';
+import baseQuery from './BaseQuery';
 
 export const UsersApi = createApi({
   reducerPath: 'usersApi',
-  baseQuery: fetchBaseQuery({ 
-    baseUrl: 'http://localhost:3000',
-    prepareHeaders: (headers) => {
-      const token = getAuthToken();
-      if (token) {
-        headers.set('authorization', `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery,
   tagTypes: ['User'],
   endpoints: (builder) => ({
     getUsers: builder.query<IUser[], void>({
@@ -21,11 +12,11 @@ export const UsersApi = createApi({
       providesTags: ['User'],
     }),
     getUser: builder.query<IUser, number>({
-      query: (id) => `users/${id}`,
+      query: (id: number) => `users/${id}`,
       providesTags: ['User'],
     }),
     createUser: builder.mutation<IUser, IUserCreateDto>({
-      query: (user) => ({
+      query: (user: IUserCreateDto) => ({
         url: 'users',
         method: 'POST',
         body: user,
@@ -33,7 +24,7 @@ export const UsersApi = createApi({
       invalidatesTags: ['User'],
     }),
     updateUser: builder.mutation<IUser, { id: number; user: IUserUpdateDto }>({
-      query: ({ id, user }) => ({
+      query: ({ id, user }: { id: number; user: IUserUpdateDto }) => ({
         url: `users/${id}`,
         method: 'PATCH',
         body: user,
@@ -41,7 +32,7 @@ export const UsersApi = createApi({
       invalidatesTags: ['User'],
     }),
     deleteUser: builder.mutation<void, number>({
-      query: (id) => ({
+      query: (id: number) => ({
         url: `users/${id}`,
         method: 'DELETE',
       }),

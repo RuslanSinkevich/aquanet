@@ -1,5 +1,5 @@
 // src/connection-points/connection-points.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ConnectionPoint } from '../models/connection-point.model';
 import { User } from '../models/user.model';
@@ -8,6 +8,7 @@ import { CreateConnectionPointDto } from './dto/create-connection-point.dto';
 import { Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { UpdateConnectionPointDto } from './dto/update-connection-point.dto';
+import { UserConnectionPoint } from '../models/user-connection-point.model';
 
 @Injectable()
 export class ConnectionPointsService {
@@ -19,19 +20,22 @@ export class ConnectionPointsService {
     @InjectModel(WorkItem)
     private workItemModel: typeof WorkItem,
     private sequelize: Sequelize,
+    @InjectModel(UserConnectionPoint)
+    private userConnectionPointModel: typeof UserConnectionPoint,
   ) {}
 
-  async create(createDto: CreateConnectionPointDto, transaction?: Transaction) {
+  async create(createConnectionPointDto: CreateConnectionPointDto, transaction?: Transaction): Promise<ConnectionPoint> {
     const dbData = {
-      name: createDto.name,
-      positionM: createDto.positionM,
-      totalCost: createDto.totalCost,
-      comment: createDto.comment
+      name: createConnectionPointDto.name,
+      positionM: createConnectionPointDto.positionM,
+      totalCost: createConnectionPointDto.totalCost,
+      comment: createConnectionPointDto.comment
     };
-    return this.connectionPointModel.create(dbData, { transaction });
+    const connectionPoint = await this.connectionPointModel.create(dbData, { transaction });
+    return connectionPoint;
   }
 
-  async findAll() {
+  async findAll(): Promise<ConnectionPoint[]> {
     const points = await this.connectionPointModel.findAll({
       include: [
         {
@@ -47,7 +51,7 @@ export class ConnectionPointsService {
     return points;
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<ConnectionPoint> {
     const point = await this.connectionPointModel.findByPk(id, {
       include: [
         {
@@ -61,32 +65,26 @@ export class ConnectionPointsService {
       ],
     });
     if (!point) {
-      return null;
+      throw new NotFoundException(`Connection point with ID ${id} not found`);
     }
     return point;
   }
 
-  async update(id: number, updateDto: UpdateConnectionPointDto, transaction?: Transaction) {
-    const point = await this.connectionPointModel.findByPk(id, { transaction });
-    if (!point) {
-      return null;
-    }
+  async update(id: number, updateConnectionPointDto: UpdateConnectionPointDto, transaction?: Transaction): Promise<ConnectionPoint> {
+    const point = await this.findOne(id);
     const dbData = {
-      name: updateDto.name,
-      positionM: updateDto.positionM,
-      totalCost: updateDto.totalCost,
-      comment: updateDto.comment
+      name: updateConnectionPointDto.name,
+      positionM: updateConnectionPointDto.positionM,
+      totalCost: updateConnectionPointDto.totalCost,
+      comment: updateConnectionPointDto.comment
     };
-    return point.update(dbData, { transaction });
+    await point.update(dbData, { transaction });
+    return point;
   }
 
-  async remove(id: number, transaction?: Transaction) {
-    const point = await this.connectionPointModel.findByPk(id, { transaction });
-    if (!point) {
-      return null;
-    }
+  async remove(id: number, transaction?: Transaction): Promise<void> {
+    const point = await this.findOne(id);
     await point.destroy({ transaction });
-    return point;
   }
 
   async calculateClientShares(connectionPointId: number, transaction?: Transaction) {
@@ -122,5 +120,28 @@ export class ConnectionPointsService {
     }
 
     return shares;
+  }
+
+  async addUser(connectionPointId: number, userId: number): Promise<void> {
+    await this.findOne(connectionPointId);
+    await this.userConnectionPointModel.create({
+      connectionPointId,
+      userId,
+    });
+  }
+
+  async removeUser(connectionPointId: number, userId: number): Promise<void> {
+    await this.findOne(connectionPointId);
+    await this.userConnectionPointModel.destroy({
+      where: {
+        connectionPointId,
+        userId,
+      },
+    });
+  }
+
+  async getUsers(connectionPointId: number): Promise<User[]> {
+    const connectionPoint = await this.findOne(connectionPointId);
+    return connectionPoint.users;
   }
 }

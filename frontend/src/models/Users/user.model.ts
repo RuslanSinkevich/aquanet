@@ -24,6 +24,7 @@ export interface IUserUpdateDto {
   lastName?: string;
   phone?: string;
   houseNumber?: string;
+  role?: UserRole;
   isConfirmed?: boolean;
   banned?: boolean;
 }
@@ -34,4 +35,5 @@ export interface IUserCreateDto {
   phone: string;
   houseNumber: string;
   password: string;
+  role?: UserRole;
 }

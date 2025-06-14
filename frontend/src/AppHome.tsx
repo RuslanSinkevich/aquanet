@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "hooks/Redux";
 import { useMeQuery } from "services/AuthApi";
 import { setCredentials, logout } from "store/slice/AuthSlice";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { WaterConnectionPage } from './pages/WaterConnectionPage';
 import { ConnectionPointsList } from './modules/connection-points/ConnectionPointsList';
-import { ClientsList } from './modules/clients/ClientsList';
+import { UsersList } from './modules/users/UsersList';
 import { MaterialsList } from './modules/materials/MaterialsList';
 import { WorkItemsList } from './modules/works/WorkItemsList';
 import WaterConnectionInfo from './modules/info/WaterConnectionScheme';
@@ -67,10 +67,11 @@ export const AppHome: React.FC = () => {
         <Route path="/" element={<WaterConnectionPage />} />
         <Route path="/scheme" element={<WaterConnectionInfo />} />
         <Route path="/connection-points" element={<ConnectionPointsList />} />
-        <Route path="/clients" element={<ClientsList />} />
+        <Route path="/users" element={<UsersList />} />
         <Route path="/materials" element={<MaterialsList />} />
         <Route path="/works" element={<WorkItemsList />} />
         <Route path="/payments" element={<PaymentsList />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AppLayout>
   );
