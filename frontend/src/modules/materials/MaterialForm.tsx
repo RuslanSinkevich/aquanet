@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Input, InputNumber, Button, message } from 'antd';
 import { useCreateMaterialMutation, useUpdateMaterialMutation } from '../../services/MaterialsApi';
 import type { IMaterial, IMaterialCreateDto } from '../../models/Material/material.model';
@@ -12,6 +12,14 @@ export const MaterialForm: React.FC<MaterialFormProps> = ({ initialValues, onSuc
   const [form] = Form.useForm();
   const [createMaterial] = useCreateMaterialMutation();
   const [updateMaterial] = useUpdateMaterialMutation();
+
+  useEffect(() => {
+    if (initialValues) {
+      form.setFieldsValue(initialValues);
+    } else {
+      form.resetFields();
+    }
+  }, [initialValues, form]);
 
   const handleSubmit = async (values: IMaterialCreateDto) => {
     try {
@@ -34,7 +42,6 @@ export const MaterialForm: React.FC<MaterialFormProps> = ({ initialValues, onSuc
       form={form}
       layout="vertical"
       onFinish={handleSubmit}
-      initialValues={initialValues}
     >
       <Form.Item
         name="type"

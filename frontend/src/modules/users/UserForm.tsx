@@ -24,6 +24,8 @@ export const UserForm: React.FC<IUserFormProps> = ({
   useEffect(() => {
     if (initialValues) {
       form.setFieldsValue(initialValues);
+    } else {
+      form.resetFields();
     }
   }, [initialValues, form]);
 
@@ -79,7 +81,6 @@ export const UserForm: React.FC<IUserFormProps> = ({
       form={form}
       layout="vertical"
       onFinish={handleSubmit}
-      initialValues={initialValues}
     >
       <Form.Item
         name="firstName"

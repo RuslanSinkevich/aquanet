@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Input, InputNumber, DatePicker, Select, Button, message } from 'antd';
 import { useCreateWorkItemMutation, useUpdateWorkItemMutation } from '../../services/WorkItemsApi';
 import { useGetUsersQuery } from '../../services/UsersApi';
@@ -15,6 +15,17 @@ export const WorkItemForm: React.FC<WorkItemFormProps> = ({ initialValues, onSuc
   const [createWorkItem] = useCreateWorkItemMutation();
   const [updateWorkItem] = useUpdateWorkItemMutation();
   const { data: users } = useGetUsersQuery();
+
+  useEffect(() => {
+    if (initialValues) {
+      form.setFieldsValue({
+        ...initialValues,
+        workDate: initialValues.workDate ? dayjs(initialValues.workDate) : undefined,
+      });
+    } else {
+      form.resetFields();
+    }
+  }, [initialValues, form]);
 
   const handleSubmit = async (values: IWorkItemCreateDto) => {
     try {
@@ -43,10 +54,6 @@ export const WorkItemForm: React.FC<WorkItemFormProps> = ({ initialValues, onSuc
       form={form}
       layout="vertical"
       onFinish={handleSubmit}
-      initialValues={initialValues ? {
-        ...initialValues,
-        workDate: initialValues.workDate ? dayjs(initialValues.workDate) : undefined,
-      } : undefined}
     >
       <Form.Item
         name="description"

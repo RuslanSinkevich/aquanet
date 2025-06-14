@@ -102,6 +102,7 @@ export const MaterialsList: React.FC = () => {
         onCancel={() => setIsModalVisible(false)}
         footer={null}
         width={800}
+        destroyOnClose
       >
         <MaterialForm
           initialValues={selectedMaterial || undefined}
