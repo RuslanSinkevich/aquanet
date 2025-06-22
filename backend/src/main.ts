@@ -2,6 +2,10 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
+import * as dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config({ path: `env.${process.env.NODE_ENV || 'development'}` });
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -48,7 +52,7 @@ async function bootstrap() {
   });
 
   const port = process.env.PORT || 3001;
-  const host = process.env.HOST || '0.0.0.0';
+  const host = process.env.HOST || 'localhost';
   await app.listen(port, host);
   logger.log(`Application is running on: http://${host}:${port}`);
 }
