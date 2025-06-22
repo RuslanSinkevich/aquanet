@@ -14,9 +14,9 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
   
-  // Configure CORS to allow requests from the frontend
+  // Configure CORS to allow requests from any origin
   app.enableCors({
-    origin: ['http://91.84.98.3', 'http://localhost:3000', 'http://localhost:5173'],
+    origin: true,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
