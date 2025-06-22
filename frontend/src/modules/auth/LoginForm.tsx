@@ -62,7 +62,7 @@ export default function LoginForm({
       open={isShowModal}
       footer={null}
       onCancel={onClose}
-      destroyOnClose
+      destroyOnHidden
     >
       <Form
         name="login"

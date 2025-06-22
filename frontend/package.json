@@ -26,14 +26,14 @@
     "uuid": "^11.1.0"
   },
   "scripts": {
-    "build": "env-cmd -f env. -e local vite build",
+    "build": "env-cmd -e local vite build",
     "eject": "vite eject",
-    "start": "rimraf ./build && env-cmd -f env. -e local vite",
-    "start-vite-debug": "rimraf ./build && env-cmd -f env. -e local vite --debug",
+    "start": "rimraf ./build && env-cmd -e local vite",
+    "start-vite-debug": "rimraf ./build && env-cmd -e local vite --debug",
     "test": "cross-env CI=true vitest",
     "lint": "eslint ./src/**/*.{ts,tsx,js,jsx}",
-    "prod": "env-cmd -f env. -e prod vite build",
-    "debug": "env-cmd -f env. -e dev vite build"
+    "prod": "env-cmd -e prod vite build",
+    "debug": "env-cmd -e dev vite build"
   },
   "eslintConfig": {
     "extends": [
